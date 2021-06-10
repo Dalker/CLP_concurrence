@@ -1,0 +1,50 @@
+\documentclass{beamer}
+
+% importations de packages utiles
+\usepackage[utf8]{inputenc}  % pouvoir écrire avec des accents
+\usepackage[french]{babel}  % francophopnie
+\usepackage{hyperref}  % liens clicables dans pdf final
+\usepackage{tikz}  % pouvoir tracer des dessins sympas
+\usetheme{Boadilla}  % thème de beamer
+\usepackage{listingsutf8}  % rendu de "code" (avec config ci-dessous)
+\definecolor{lstcolor}{rgb}{0.9,0.95,0.95}
+\definecolor{lstcommentcolor}{rgb}{0.,0.2,0.}
+\lstset{
+  frameround=tttt,
+  %autogobble,
+  frame=single,
+  backgroundcolor=\color{lstcolor},
+  % extendedchars=true,
+  % basicstyle=\ttfamily\small,
+  keywordstyle=\bfseries\color{blue},
+  identifierstyle=\bfseries\color{red},
+  stringstyle=\bfseries\color{orange},
+  commentstyle=\color{lstcommentcolor},
+  language=Python,
+  keepspaces=True,
+  basicstyle=\fontfamily{pcr}\selectfont\small, % monospace it for copypasting
+  upquote=true,
+  columns=flexible,
+  showstringspaces=False,
+  literate={é}{{\'e}}1
+}
+\title{La Concurrence}
+\subtitle{Concepts de Langages de Programmation}
+\author{Juan-Carlos Barros et Daniel Kessler}
+% et c'est parti
+\begin{document}
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \tableofcontents
+\end{frame}
+
+\section{Blabla}
+\begin{frame}
+  \frametitle{Blabla}
+  \ldots
+\end{frame}
+
+\end{document}
