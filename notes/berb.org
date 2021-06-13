@@ -1,0 +1,118 @@
+#+TITLE: Concurrence selon https://berb.github.io/diploma-thesis/original/023_concurrency.html
+#+AUTHOR: Dalker (daniel.kessler@dalker.org)
+* Buts
+  - *réduire latence* en subdivisant en parties exécutées de manière concurrente
+  - *cacher latence* lorsque des tâches bloquent en attendant du I/O ou du réseau
+  - *augmenter le 'throughput'* en général ce qui contribue aussi aux tâches
+    séquentielles qui attendent
+* Remarques
+  - la concurrence est intrinsèque à tout système distribué (processus dans
+    machines séparées faisant partie d'un même système)
+  - c'est le cas de toutes les applications web, qui peuvent être utilisées par
+    plusieurs utilisateurs simultanément
+* 4 approches pour programmer la concurrence
+  - *séquentielle*: pas de concurrence, ordre total des opérations, peut garder
+    déterminisme; possibilité de *coroutines*
+  - *déclarative*: le flux de contrôle est implicite; non-déterminisme à
+    l'exécution mais pas observable de l'extérieur
+  - *messages*: les activités n'interragissent que par messages (synchrones ou
+    asynchrones) et sinon sont isolées
+  - *état partagé*: des ressources et états sont accessibles par plusieurs
+    activités, ce qui nécessite des mécanismes de synchronisation et de
+    coordination entre ces activités, sans quoi on pert tout déterminisme,
+    invariants, cohérence et validité des états
+* contrôle par synchronisation et coordination
+  - deux soucis: accès à mêmes espaces mémoire, communication sur progression
+    d'activités travaillant sur un même problème
+  - *synchronisation* ("compétitive"): contrôle d'accès à ressources partagées entre activités différentes
+  - *coordination* (= synchrnisation coopérative): collaboration entre activités
+  - ces deux mécanismes peuvent être explicites ou implicites (cachés dans la
+    sémantique du langage de programmation)
+* exécution des tâches concurrentes
+  - *multitasking* de l'OS pour gérer les tâches "interleaved" et alternées
+  - *multiprocessing*: implémentation possible du multitasking avec plusieurs
+    coeurs de cpu
+  - *scheduling*: organisation de l'assignement de temps de processeur aux
+    tâches par l'OS, suivant différentes stratégies
+  - *preemption*: le scheduler assigne du temps à une tâche mais peut le
+    révoquer, sans que la tâche n'ait de contrôle là-dessus
+  - modèle *coopératif*: la tâche elle-même est responsable de "yield" après un
+    certain temps
+  - les *threads* d'un même processus sont comme des "processus légers" bon
+    marché à créer, partageant de la mémoire, accès fichiers et autres
+    ressources à l'interne du processus - ceci est peut-être invisible dans le
+    langage et s'applique au "runtime"
+* soucis particuliers des systèmes distribués
+  - *fault tolerance*: il faut prévoir qu'un élément d'un réseau peut être
+    inaccessible ou en panne
+  - intégration des aspects distribués
+  - des langages généralistes comme Java ne sont pas forcément adaptés à ce
+    contexte
+* concurrence basée sur Threads, Locks et Shared state
+  - c'est compliqué et source d'erreurs, mais relativement proche de la
+    programmation impérative "à la von Neumann", donc présent dans la plupart
+    des langages de programmation
+  - un *thread* est un flux de contrôle séquentiel apparamment isolé des autres
+    activités *mais* à la différence d'un processus il partage des variables et
+    états au sein de son processus
+  - la *programmation séquentielle* est basée sur le concept d'*état mutable*,
+    donc les threads peuvent être en compétition pour l'écriture!
+  - on utilise généralement du *preemptive scheduling*, donc l'interleaving
+    exact n'est pas connu d'avance, ce qui crée de l'indétermination
+  - état mutable + indétermination => danger de "race conditions" quand
+    plusieurs threads sont en compétition pour l'accès à une *section critique*
+    -> on a besoin de *locking mechanisms* pour éviter des états parallèles ou incohérents
+  - le *sémaphore* de Dijkstra (1964) utilise des fonctions /wait/ pour entrer dans une
+    section critique et /signal/ pour la libérer à la fin
+  - le *monitor* de Hoare (1974) protège des sections (généralement des objets
+    ou fonctions/méthodes) avec des *variables de condition*
+  - cependant, la solution (les locks) peut créer un nouveau problème si les
+    verrous ne sont pas déverrouillés ou si on arrive à un *deadlock*, par
+    exemple avec des dépendances cycliques entre verrous
+  - les *livelocks* ou *starvations* créent une réaction cyclique empêchant à un
+    thread d'acquérir un verrou
+  - c'est pire avec beaucoup de petits verrous - mais un seul gros verrou réduit
+    le souhait de "parallélisme"...
+  - l'utilisation *directe* des threads et verrous met le programmeur devant
+    tous ces problèmes, donc leur utilisation *indirecte* ("cachée" par derrière
+    d'autres mécanismes) est fortement recommandée
+* concurrence à état partagé avec mémoire transactionnelle
+  - la mémoire transactionnelle donne un accès "haut-niveau" et sûr aux verrous
+  - une *transaction* est un concept initialement des /bases de donnée/,
+    appliquée à la *concurrence avec état partagé*
+  - une transaction doit garantir l'atomicité, cohérence, isolation et
+    durabilité, en donnant l'impression d'être une opération unique
+  - la gestion des transactions peut être "pessimiste": verrous forts, peu de
+    transactions à la fois ou "optimiste": vérifications faites à la fin
+    uniquement pouvant résulter en l'annulation et redémarrage de la
+    transaction, ce qui a normalement une nettement meilleure performance
+  - les implémentations de "software transactional memory" permettent le
+    contrôle de concurrence "optimiste"
+  - le langage de programmation doit permettre d'indiquer que des sections de
+    code sont "transactionnelles", et de distinguer entre variables
+    "transactionnelles" et simples variables locales sans danger
+  - des mécanismes de "retry" et "orElse" sont possibles dans certains langages,
+    pour prévoir des situations en cours de transactions concurrentes
+  - limitation: c'est bien pour la mémoire partagée, mais ça ne gère pas le
+    partage de ressources extérieures
+  - limitation: les transactions ne peuvent pas avoir d'effets de bord au-delà
+    de leur modification de l'état partagé déclaré comme "transactionnel", donc
+    pas d'accès I/O par exemple
+  - souci: la "famine" peut toujours arriver! (compétition entre transactions)
+  - implémentation: le langage *Clojure* se spécialise sur ce paradigme de
+    concurrence; clojure est un langage basé sur Lisp et tournant sur une JVM,
+    avec un concept fort d'*immutabilité* et des agents asynchrones
+  - les mécanismes ressemblent à ceux du "garbage collector" et ont un but
+    semblable de décharger le programmeur de la gestion minutieuse de la mémoire
+  - Clojure de plus près: on a des *valeurs* immutables, des *identités*
+    pointant vers une valeur de manière mutable, des *références* vers des
+    identités, et des *états* dont le changement se fait en réaffectant des
+    identités à des nouvelles valeurs, le tout grâce à des structures de donnée
+    persistantes (au sens de "gardant leur histoire")
+* concurrence basée sur Acteurs
+  ...
+* concurrence basée sur Events
+  ...
+* autres modèles de concurrence
+  ...
+    
