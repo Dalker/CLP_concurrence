@@ -1,0 +1,68 @@
+#+TITLE: Modèles de concurrence
+#+AUTHOR: Dalker (daniel.kessler@dalker.org)
+source initiale: https://cs.lmu.edu/~ray/notes/introconcurrency/, puis
+bifurcations vers d'autres
+* bla
+  - concurrence => parallèlisme réel et/ou "interleaving" (avec possibles
+  ressources partagées) + éventuelle distribution (communication par messages
+  plutôt que mémoire partagée) + synchronisation (donc blocage en attente d'un résultat)
+* difficultés
+  - programmation concurrente vs. programmation séquentielle: on aura plusieurs
+    programmes séquentiels qui communiquent, donc des nouveaux problèmes
+  - synchronisation / partage de ressources
+  - gare aux "race conditions" / interblocage / famine
+  - récupération si un noeud d'un système distribué ne fonctionne plus ("fault tolerance")
+* Outils de modélisation
+  - Acteurs
+  - Goroutines: communication via canaux
+  - Coroutines: communications via "yield"  
+  - Algèbre de processus / Calcul de processus pour descrption math de sys concurrents
+* Threads vs Messages
+  -> séparé dans sa propre page [[threads_vs_messages.org]]
+* interleaving / scheduling
+  - on suppose des threads avec des séquences d'intructions atomiques dont la
+    durée d'exécution n'est pas connue d'avance: plusieurs séquences sont donc
+    possibles!
+    
+    ex: thread [A B C] et thread [x y] peuvent donner [A B C x y], ou [A x B C y],
+    ou [x A B y C], etc... soit $C^{m+n}_n$ possibilités
+  - si on a $M$ processeurs et $N$ threads avec $M < N$, on a besoin d'un
+    scheduler pour l'interleaving; un thread peut être momentanément "Ready",
+    "Running" ou "blocked"
+
+    Ready ---> Running quand processeur disponible
+    Ready <--- Running quand le "time slice" est fini ou quand requête pour une resource
+    Running -> Blocked -> Ready quand mis en attente
+  - un programme concurrent doit être *correct* pour tous les interleavings
+    possibles! (ce qui complique évidemment les tests)
+* granularité
+  - niveau instruction machine: les processeurs modernes font du parallélisme
+    automatique
+  - niveau instruction langage: notations pour parallèle vs séquentiel, par
+    exemple "begin/end vs cobegin/coend" en Pascal, "SEQ vs PAR" en Occam,
+    "; vs ||" en algèbre
+  - niveau procédure: threads, parfois directement dans le langage, sinon via
+    un appel de librairie
+  - niveau programme: responsabilité de l'OS; nouveaux processus peuvent être
+    lancés en faisant appel à l'OS depuis certains langages (Java, ...)
+* communication entre threads de contrôle
+  - mémoire partagée (indirect)
+  - messages (direct)
+* synchronisation
+  un thread devrait protéger une "section critique" de code soit avec un lock
+  soit avec un mécanisme plus haut-niveau pour effectuer une "transaction" de
+  manière sûre (comme le classique dépôt de $100 dans un compte, dont toutes les
+  étapes de la transaction doivent être finies avant qu'un autre thread puisse
+  agir sur ce compte, sans quoi les écritures/lectures peuvent aboutir à un état
+  contradicoire)
+* contraintes temporelles
+  un /real-time system/ pourra avoir des tâches devant être effectués en un
+  temps maximal (courant dans les systèmes embarqués)
+* paradigmes / "programming patterns"
+  entre autres:
+  - pour du code asynchrone, privilégier les /futures/ et "promesses" aux callbacks
+  - "programmation réactive"
+  - Acteurs de Hewitt
+  - algèbre de processus, par exemple CSP de Hoare ou CCS de Milner
+  - Clojure de Rich Hickey: https://www.infoq.com/presentations/Are-We-There-Yet-Rich-Hickeya/
+  - Erlang et ses "fault-tolerance" et autres

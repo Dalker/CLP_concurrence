@@ -1,0 +1,37 @@
+#+TITLE: Dîner des Philosophes d'Edsger Dijkstra
+#+AUTHOR: Dalker (daniel.kessler@dalker.org)
+* énoncé
+  - 5 philosophes (ou plus) sont autour d'une table ronde, avec un plat devant
+    chacun et une fourchette entre deux [ou une baguette chinoise, ce qui est
+    plus logique: on a besoin d'une paire]
+  - pour manger, un philosophe doit utiliser deux fourchettes: celle à sa gauche
+    et celle à sa droite
+  - soit il est en train de manger (temps déterminé), soit il a faim et essaye
+    d'attraper des fourchettes (temps maximal déterminé), soit il pense (temps
+    indéterminé)
+* problèmes
+  - suivant l'ordre dans lequel ils mangent, il peut y avoir /famine/(/resource
+    starvation/): un philosophe qui n'arrive jamais a avoir 2 fourchettes
+    disponibles
+  - il peut même y avoir /interblocage/ (/deadlocks/): si chacun attrape la
+    fourchette à sa gauche et attend que celle de droite se libère, la situation
+    reste bloquée pour l'éternité
+  - un philosophe qui est en famine torp longtemps meurt, càd le processus
+    /crashe/, mais s'il avait une fourchette à la main, son voisin du côté
+    correspondant ne pourra plus jamais manger!
+* solutions
+  - /sémaphore/ de Dijkstra
+  - solution de /Chandy/Misra/:
+    1. chaque fourchette va d'abord au vosin qui a le plus petit nom (ie
+       nécessite une /relation d'ordre/)
+    2. un philosophe qui a faim émet une requête à ses voisins
+    3. en recevant une requête: si la fourchette est propre, on la garde, si
+       elle est sale, on la nettoie et on la donne
+    4. après manger, les deux fourchettes sont sales, on les nettoie et on les
+       donne à quelqu'un qui aurait émis une requête pendant qu'on mageait
+  - /algorithme du banquier/ de Dijkstra, limité parce qu'il suppose que l'on
+    sache à l'avance quelles ressources seront nécessaires par quel algorithme
+* représentation
+  - un réseau de petri:
+    https://fr.wikipedia.org/wiki/D%C3%AEner_des_philosophes#/media/Fichier:4-philosophers.gif
+    

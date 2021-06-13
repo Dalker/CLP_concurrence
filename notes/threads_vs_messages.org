@@ -1,0 +1,94 @@
+#+TITLE: 2 modèles de concurrence: thread-based vs. message-based
+#+AUTHOR: Dalker (daniel.kessler@dalker.org)
+* 2 points de vues possibles: Threads vs. Events
+  source initiale: https://cs.lmu.edu/~ray/notes/introconcurrency/
+  - threads => locks, mutexes, countdowns, condition variables, semaphores, etc.
+    ou "monitors" (higher-level)
+  - dualité entre threads avec ressources partagées ou processus communicant par
+    messages (cf. https://berb.github.io/diploma-thesis/original/043_threadsevents.html)
+  - ces deux modèles sont duaux: on peux traduire un programme d'un modèle dans
+    l'autre; ils sont donc /logiquement équivalents/ mais utilisent des concepts
+    et une syntaxe différente; pas de différence significative de performance
+    [tout ça selon /Lauer et Needham/ - la réalité n'est pas forcément comme
+    cette théorie...]
+  - *thread-based*: monitor, scheduling, exported functions, return from
+    procedure, execute blocking procedure call, wait on condition variables
+  - *event-driven*: event handler, event loop, event types accepted by event
+    handler, dispatch a reply, dispatch a message and await a reply, await
+    messages
+  - on peut représenter les deux avec un /blocking graph/
+  - en traduisant un programme entre ces deux modèles, la syntaxe change mais le
+    *contenu sémantique est le même* [selon Lauer et Needham]
+  - point de vue *thread*: un thread a un /flux de contrôle/ séquentiel, il
+    prend le point de vue de la tâche et ressemble à un code séquentiel non
+    concurrent *mais* dès qu'il y a une ressource partagée on a des problèmes
+    sérieux de synchronisation et chaque thread nécessite sa propre mémoire
+    (stack) plus les locks (mémoire + problèmes possibles)
+  - point de vue *event*: event-loop dans un seul thread, ce qui évite des tas
+    de problèmes (pas de locks) tout en créant l'illusion de concurrence
+    "multi-thread"; les event handles et callbacks sont développer sans se
+    préocuper d'un accès concurrent à des variables d'état; l'exécution est plus
+    déterministe; l'asynchronicité est plus visible; cependant, l'event loop
+    avec des "handlers" enregistrés fragmente le code en "event handlers" et
+    "callbacks" qui peuvent former des longues chaînes de petits bouts de code
+    en cascade (les mauvaises langues parlent de "delayed GOTO"); on perd
+    l'abstraction / point de vue plus haut-niveau des threads et on ne peut pas
+    utiliser directement des algorithmes séquentiels; le flux de contrôle n'est
+    pas net et du coup il faut souvent sauver/récupérer l'état (c'est un peu
+    mieux si on peut utiliser des closures par exemple); pour le thread, son
+    état fait partie de son stack, indépendemment du scheduling, mais pour
+    l'événement, le handler doit se débrouiller quand il est appelé
+  - conclusion: les threads ont des soucis de deadlocks/livelocks et mémoire de
+    leur stacks vs. l'event-driven est peut être interrompu quand un callback
+    met trop de temps à s'exécuter (donc l'un est embêté par la mémoire et les
+    locks, l'autre par l'utilisation excessive du cpu)
+* Threads vs. Events 2: 5 concepts
+  (selon Adya et al. cité par
+  https://berb.github.io/diploma-thesis/original/043_threadsevents.html)
+  les 5 concepts suivants sont sensés être "orthogonaux"
+** Task Management
+   flux d'exécution séparé en tâches séparées qui coexistent
+   -> question de comment passer d'une tâche à l'autre:
+   - *séquentiellement* (une tâche qui démarre va jusqu'au bout avant la
+     suivante)? évite conflits (exécution isolée) mais ne permet pas
+     parallélisme et peut créer délais
+   - via "*scheduler*": plus utile, mais la tâche ne sera pas au courant du
+     "management des tâches"
+   - de manière *coopérative*: avec "*yields*" coopératifs et explicites; sorte
+     de "meilleur des deux mondes", facilite le fait de travailler avec des
+     *invariants* et un *état* et réduit le nombre de "context switches" dans le
+     cas du multi-thread
+** Stack Management
+   - automatique dans le modèle "thread-based"
+   - dans le modèle "event-based" une tâche logique est sépparée en plusieurs
+     events et handlers sans notion directe de stack; le développeur doit donc
+     créer explicitement son stack ("stack ripping"): avant le "yield", un tâche
+     doit sérialiser et sauvegarder son stack; plus tard, il devra le charger et
+     reconstruire
+   - certains langages ont des idiomes pour le "stack ripping", comme les
+     *closures* (fonctions qui encapsulent leur environnement de référence, càd
+     leur "stack") et *continuations* (closures qui encapsulent aussi l'état de
+     contrôle), par exemple dans Scheme
+** I/O Management
+   - synchrone vs. asynchrone
+   - NB: chacun des concepts de "taks management" peut être utilisé avec du I/O
+     synchrone ou asynchrone
+** Conflic Management
+   - but: garantir que l'état est cohérent entre tâches
+   - dépend de la granularité/atomicité des opérations
+   - simple dans le task management séquentiel et relativement simple dans le
+     coopératif single-threaded, où on peut raisonner en terme d'invariants
+** Data Partitioning
+   - partitionner les données et laisser assez peu d'accès à l'"état" réduit la
+     possibilité de conflits
+   - un état local au thread est par exemple utile
+** Conclusion
+   le "thread-based" fait du stack management automatique mais son "task
+   management" (scheduling) pose problème; le "efent-driven" a du task
+   management coopératif simple mais demande du "stack management" manuel;
+   l'idéal serait du task management coopératif ensemble avec du "stack
+   management" automatique
+
+   -> certains systèmes "event-driven" modernes se rapprochent de ça, par
+   exemple node.js, via des /closures/ qui encapsulent le /stack/ dans les
+   /callbacks/
