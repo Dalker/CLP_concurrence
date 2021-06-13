@@ -1,0 +1,65 @@
+#+TITLE: Modèle d'Acteur
+#+AUTHOR: Dalker (daniel.kessler@dalker.org)
+cf. notamment: https://en.wikipedia.org/wiki/Actor_model
+
+* Généralités
+Ce modèle de systèmes concurrent datant de 1973 suppose des *acteurs* pouvant
+recevoir des *messages*.
+
+Un acteur peut:
+- prendre des décisions locales
+- créer d'autres acteurs
+- envoyer des messages
+- déterminer comment répondre au prochain message reçu
+
+Un acteur possède un *état privé* et ne peut agir sur d'autres acteurs
+qu'indirectement via des messages (donc pas de locks nécessaires pour la
+synchronisation).
+
+Note DK: ça semble être le "message model" qui s'oppose au "thread model", cf. [[threads_vs_message.org]]
+* Historique et sémantiques
+  /Carl Hewitt/ (auteur original en 1973) prétend que c'est inspiré de la
+  physique et influencé par des langages comme Lisp et Simula. C'était prévu
+  pour l'idée de beaucoup de petits microprocesseurs travaillant en parallèle,
+  ce qui est effectivement possible maintenant.
+
+  /Irene Greif/ a développé une *sémantique opérationnelle* pour le modèle
+  acteur par la suite, puis Hewitt et Henry Baker des *lois axiomatiques*.
+  William Clinger a introduit une *sémantique dénotationnelle* en 1981
+  (cf. https://en.wikipedia.org/wiki/Denotational_semantics_of_the_Actor_model)
+* Concepts
+  - Orienté Objet: "tout est un objet" *vs*
+  - Modèle Acteur: "tout est un acteur"
+  - un acteur peut:
+    - envoyer un nombre fini de messages à d'autres acteurs
+    - créer un nombre fini d'autres acteurs
+    - déterminer un comportement pour le prochain message reçu
+  - il n'y a pas de séquence présupposée de ces actions, afin de permettre le parallélisme/concurrence
+  - le découplage acteur/message permet la *communication asynchrone*
+  - un acteur ne peut communiquer qu'avec d'autres acteurs dont il connaît
+    l'*addresse* ("postale" pour les messages, pas "mémoire")
+* Applications
+  - courrier électronique
+  - services Web selon "Simple Object Access Protocol" (SOAP)
+* Lien avec objets avec lock
+  - un objet avec *lock* et une *queue* interne (pouvant recevoir continûment
+    des messages) peut être modélisé comme un /serializer/ en modèle acteur
+* soucis théoriques?
+  - les premiers programmes concurrents étaient probablement les /interrupt
+    handlers/, qui ont les premiers montré les problèmes
+  - début 1960s: shared memory => problèmes de contrôle => "mutual exclusion" =>
+    /sémaphores/ de Dijkstra => /monitors/ de Hoare et Hansen
+  - le problème de la mémoire partagée est resté, jusqu'à l'invention des
+    /serializers/
+  - les machines de Turing et lambda calculus supposaient un *état global*, le
+    modèle acteur n'a *pas* d'état global, ce qui peut éviter des problèmes
+    théoriques
+* particularités
+  - la communication est par défaut asynchone
+  - la concurrence est implicite (c'est concurrent par défaut)
+  - les messages ne doivent pas forcément arriver dans l'ordre où ils ont été envoyés
+  - problème d'indétermination
+  - les actions sont localisées (contrairement au réseau de Petri)
+  - la topologie est variable (contrairement au modèle CSP de Hoare)
+  - a influencé le développement du $\pi$-calculus puis du process calculus
+

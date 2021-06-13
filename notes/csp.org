@@ -1,0 +1,18 @@
+#+TITLE: langage formel "Communicating Sequential Process" de Hoare
+#+AUTHOR: Dalker (daniel.kessler@dalker.org)
+C'est un langage formel qui décrit des "patterns" d'interaction dans des
+systèmes concurrents. Il fait partie des "algèbres de processus" ou "calculs de
+processus" et a influencé les langages Go et Clojure, entre autres.
+
+- début: Tony Hoare 1978
+
+- formalisme:
+  https://en.wikipedia.org/wiki/Communicating_sequential_processes#Formal_definition
+
+* différences avec modèle Acteur
+  - les processus de CSP sont anonymes / les acteurs ont des identités
+  - CSP utilise des canaux spécifiques pour les messages (ce qui remplace donc
+    les identités des acteurs)
+  - dans CSP, un message ne peut être transmis que si un processus envoie et
+    l'autre reçoit, i.e. à la base c'est synchrone, mais on peut simuler de
+    l'asynchrone avec du buffering
