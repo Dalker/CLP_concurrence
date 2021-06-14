@@ -198,6 +198,13 @@
     attention à respecter le fait que les callbacks soient rapides, sinon on
     peut avoir l'équivalent de la famine; de plus, il ne faut jamais présupposer
     quoi que ce soit sur l'ordre de traitement des callbacks
-* autres modèles de concurrence
-  ...
+  - ccl: c'est très efficace pour des situations "I/O"; pour du cpu-intensif, il
+    faut "dispatcher" des "workers" (dans des threads séparés) pour ne pas tout
+    bloquer
+* autres approches et primitives pour la concurrence
+** futures, promises et asynchrnous tasks
+   
+** coroutines, fibers et green threads
+** channels et synchronous message passing
+** dataflow   
     
