@@ -162,7 +162,42 @@
     plusieurs acteurs, ce qui se déroule un peu comme dans le modèle "Shared
     Transaction Memory"
 * concurrence basée sur Events
-  ...
+  - Le modèle avec Events + event-handlers est semblable à celui d'Acteurs +
+    messages, mais ce n'est pas tout à fait la même chose. Le modèle basé sur
+    Events est moins contraignant et a pour but essentiel de se débarasser des
+    "call stacks" grâce aux messages.
+  - "call stack" normal: quand une fonction/méthode est appelée, l'appelant
+    attend le retour de l'appel avant de récupérer son contexte et continuer son
+    opération; un programme est alors une suite d'instructions et appels de
+    fonctions liés par le "call stack"
+  - avec une architecture "event-driven", il n'y a pas de "call stack"! on n'a
+    plus d'appel/retour de fonction au sens classique; à la place on a des
+    "événements", d'origine interne ou externe au programme; le "lanceur
+    d'événement" ne sait pas qui va traiter ("handle") cet événement; comme dans
+    le modèle acteur, ce paradigme est intrinsèquement *asynchrone*
+  - une implémentation courante est avec un "event loop" et des "event handlers"
+    basés sur des threads, mais on peut aussi faire du "single-thread"
+  - dans une implémentation d'event-loop single-thread, on n'a pas besoin de
+    locks parce qu'il n'y a aucun accès concurrent à des données, ce qui se
+    combine bien avec des accès I/O asynchrones non-bloquants (requêtes envoyées
+    périodiquement à l'OS pour vérifier si la ressource est accessible); c'est
+    efficace pour de la concurrence I/O
+  - si en plus on impose de ne rien partager (comme dans le modèle Acteur) c'est
+    facile à paralléliser
+  - l'objet de base est la *fonction de callback* enregistrée pour traiter un
+    certain événement; ces fonctions doivent être courtes (ne pas prendre trop
+    de temps cpu) pour ne pas bloquer l'event-loop; typiquement elles lancent
+    d'autres événements et possiblement lancent d'autres opérations en
+    arrière-plan
+  - les fonctions anonymes et les closures sont très utiles en event-driven
+    programming: les premières pour définir facilement des callbacks, les
+    secondes à la place du contexte, pour fournir une continuité (le callback
+    défini comme une closure contient son propre contexte caché)
+  - en single-thread event handler, un seul callback est effectué à la fois, ce
+    qui évite tous les problèmes de conflits (pas de deadlock possible) - mais
+    attention à respecter le fait que les callbacks soient rapides, sinon on
+    peut avoir l'équivalent de la famine; de plus, il ne faut jamais présupposer
+    quoi que ce soit sur l'ordre de traitement des callbacks
 * autres modèles de concurrence
   ...
     
