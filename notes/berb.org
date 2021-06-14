@@ -1,11 +1,18 @@
 #+TITLE: Concurrence selon https://berb.github.io/diploma-thesis/original/023_concurrency.html
 #+AUTHOR: Dalker (daniel.kessler@dalker.org)
-* Buts
-  - *réduire latence* en subdivisant en parties exécutées de manière concurrente
-  - *cacher latence* lorsque des tâches bloquent en attendant du I/O ou du réseau
+* Source
+  https://berb.github.io/diploma-thesis/original/0_preface.html
+  Thèse de diplôme de Benjamin Erb, Université d'Ulm, 2012
+
+  Ce qui suit sont des notes prises en juin 2021 par Dalker principalement à
+  partir de cette source.
+* Buts de la concurrence et remarques générales
+  - *réduire la latence* en subdivisant en parties exécutées de manière
+    concurrente
+  - *cacher la latence* lorsque des tâches bloquent en attendant du I/O ou du
+    réseau
   - *augmenter le 'throughput'* en général ce qui contribue aussi aux tâches
     séquentielles qui attendent
-* Remarques
   - la concurrence est intrinsèque à tout système distribué (processus dans
     machines séparées faisant partie d'un même système)
   - c'est le cas de toutes les applications web, qui peuvent être utilisées par
@@ -28,7 +35,7 @@
   - *coordination* (= synchrnisation coopérative): collaboration entre activités
   - ces deux mécanismes peuvent être explicites ou implicites (cachés dans la
     sémantique du langage de programmation)
-* exécution des tâches concurrentes
+* modes d'exécution des tâches concurrentes
   - *multitasking* de l'OS pour gérer les tâches "interleaved" et alternées
   - *multiprocessing*: implémentation possible du multitasking avec plusieurs
     coeurs de cpu
@@ -48,7 +55,7 @@
   - intégration des aspects distribués
   - des langages généralistes comme Java ne sont pas forcément adaptés à ce
     contexte
-* concurrence basée sur Threads, Locks et Shared state
+* modèle 1: concurrence basée sur Threads, Locks et Shared state
   - c'est compliqué et source d'erreurs, mais relativement proche de la
     programmation impérative "à la von Neumann", donc présent dans la plupart
     des langages de programmation
@@ -76,7 +83,7 @@
   - l'utilisation *directe* des threads et verrous met le programmeur devant
     tous ces problèmes, donc leur utilisation *indirecte* ("cachée" par derrière
     d'autres mécanismes) est fortement recommandée
-* concurrence à état partagé avec mémoire transactionnelle
+* modèle 2: concurrence à état partagé avec mémoire transactionnelle
   - la mémoire transactionnelle donne un accès "haut-niveau" et sûr aux verrous
   - une *transaction* est un concept initialement des /bases de donnée/,
     appliquée à la *concurrence avec état partagé*
@@ -113,7 +120,7 @@
   Changement de paradigme par rapport aux modèles précédents: il n'y a plus
   d'état partagé, donc plus besoin de le protéger via des verrous ou des
   transactions.
-* concurrence basée sur Acteurs
+* modèle 3: concurrence basée sur Acteurs
   - origine: modèles de concurrence de Hewitt (1973) et concpts de messages de
     Hoare (1978)
   - les *acteurs* sont les *primitives concurrentes* qui peuvent:
@@ -161,7 +168,7 @@
     "transactor", acteur qui émule des opérations "transactionnelles" entre
     plusieurs acteurs, ce qui se déroule un peu comme dans le modèle "Shared
     Transaction Memory"
-* concurrence basée sur Events
+* modèle 4: concurrence basée sur Events
   - Le modèle avec Events + event-handlers est semblable à celui d'Acteurs +
     messages, mais ce n'est pas tout à fait la même chose. Le modèle basé sur
     Events est moins contraignant et a pour but essentiel de se débarasser des
@@ -203,8 +210,48 @@
     bloquer
 * autres approches et primitives pour la concurrence
 ** futures, promises et asynchrnous tasks
-   
+   - Ces mécanismes permetent de "dispatcher" une tâche computationnelle
+     indépendante puis continuer le flux de contrôle normal, et synchroniser le
+     résultat plus tard quand il est disponible. Ils fournissent un "objet
+     proxy" qui permet de demander si le résultat est disponible et l'acquérir
+     si c'est le cas
+   - différence entre les deux selon
+     https://stackoverflow.com/a/28821051/613191:
+     le Future est un contenant "read-only" pour un résultat qui n'existe pas
+     encore, tandis qu'un Promise peut être écrit (une seule fois en
+     principe). Dans certains langages (Scala, C++) ces objets sont clairement
+     complémentaires (un pour le "client", l'autre pour le "serveur")
+   - dans le modèle Acteur, un Future peut représenter le fait d'envoyer un
+     message à un autre acteur et attendre sa réponse
+   - dans le modèle Event-based, les events remplacent les Futures
+   - le "scatter-gather" pattern utilise des futures pour paralléliser des
+     calculs et rassembler les résultats plus tard
 ** coroutines, fibers et green threads
+   - Les coroutines, fibres et "green threads" sont des généralisation des
+     sous-routines.
+   - Une /sous-routine/ s'exécute séquentiellement, tout de suite, tandis qu'une
+     /coroutine/ peut être suspendue et reprendre son exécution à différents
+     moments selon le besoin. Ils servent d'alternative aux /threads/ pour
+     implémenter "bas-niveau" des modèles de concurrence de plus "haut-niveau"
+     (par exemple des Actors ou Events)
+   - le langage /Google Go/ utilise ce mécanisme, avec ses "Goroutines"; au
+     niveau "runtime" elles sont automatiquement mappées vers un certain nombre
+     de threads - ou pas, selon le besoin (elles vont donc au-delà d'une
+     coroutine conventionnelle)
 ** channels et synchronous message passing
-** dataflow   
+   - les messages des modèle Acteur et Event sont asynchrones, mais hors de ces
+     modples on peut aussi utiliser des /Messages Synchrones/: l'expériteur et
+     destinataire doivent être tous deux prêts et sont bloqués pendant la
+     transmission. Cela fournit automatiquement une forme de /synchronisation/.
+   - la messagerie synchrone utilise des /canaux/ explicites entre entités
+     anonymes
+   - Google Go utilise des canaux, un peu comme les "pipes" des shell
+     Unix/Linux, pour des échanges entre /goroutines/.
+** dataflow
+   - il s'agit de /concurrence déclarative/, élégante mais peu commune en
+     pratique.
+   - on part de relations entre opérations, ce qui équivaut à un /graphe de
+     dépendances/ pour le flux d'exécution, permettant au runtime de
+     paralléliser ce qui est possible de manière automatisée et synchroniser
+     quand c'est nécessaire, via des /channels/ par exemple
     
