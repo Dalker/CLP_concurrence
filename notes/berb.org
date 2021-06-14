@@ -109,8 +109,58 @@
     identités, et des *états* dont le changement se fait en réaffectant des
     identités à des nouvelles valeurs, le tout grâce à des structures de donnée
     persistantes (au sens de "gardant leur histoire")
+* état partagé ou pas d'état partagé?
+  Changement de paradigme par rapport aux modèles précédents: il n'y a plus
+  d'état partagé, donc plus besoin de le protéger via des verrous ou des
+  transactions.
 * concurrence basée sur Acteurs
-  ...
+  - origine: modèles de concurrence de Hewitt (1973) et concpts de messages de
+    Hoare (1978)
+  - les *acteurs* sont les *primitives concurrentes* qui peuvent:
+    1. envoyer un nombre fini de messages aux autres acteurs
+    2. créer un nombre fini de nouveaux acteurs
+    3. changer son état interne, avec effet lors de la prochaine réception de
+       message
+  - les messages sont transmis de manière *asynchrone*, sans entités
+    intermédiaire (pas de "canal") mais via adressage à une "boîte postale"
+    un acteur peut avoir 0, 1 ou plusieurs "boîtes postales"; un message peut
+    même être adressé d'un acteur à lui-même via une de ses boîtes
+  - il n'y a aucune garantie sur l'ordre de réception des messages ou leur temps
+    de trajet
+  - les "race conditions" ne sont pas possibles: une "boîte aux lettres" ne peut
+    que recevoir (push) et être consultée (pop) des messages, ce qui ne crée
+    jamais de conflit
+  - historiquement, *Erlang* a été le premier langage a implémenter la
+    concurrence selon ce modèle
+  - de nos jours, certains langages ont des primitives selon ce modèle ou des
+    librairies implémentant ce modèle comme une couche au-dessus du
+    multithreading (c'est le cas par exemple de Scala: akka.actor.Actor)
+  - mise en garde: si on utilise ce modèle, il faut fortement se conformer à
+    l'absence d'état partagé, donc ne pas envoyer de références ou pointeurs
+    dans les messages, mais uniquement des données immuables et des adresses de
+    boîtes aux lettres d'acteurs
+  - dans la pratique, deux messages provenant d'un même acteur vers un même
+    destinataire arrivent dans le même ordre dans la plupart des
+    implémentations, mais des messages d'acteurs différents n'ont pas d'ordre
+    garanti (ça dépend du "interleaving")
+  - ce modèle est très facile à étendre au cas d'un système distribué
+  - si un acteur "crashe", cela n'affecte pas les autres ("fault tolerance"); on
+    peut gérer ces situations avec des "acteurs superviseurs", un "superviseur"
+    peut alors recréer l'acteur, stoper d'autres acteurs ou signaler l'erreur à
+    son propre "superviseur"
+  - il peut encore y avoir un "deadlock" si deux acteurs attendent chacun un
+    message de l'autre; on évite cela en utilisant des "timeouts"
+  - si on s'y prend mal et ne prend pas en compte l'asynchronie intrinsèque au
+    modèle, l'ordre arbitraire d'arrivée des messages pourrait donner
+    l'impression d'une "race condition"
+  - en implémentation, un acteur est plus "léger" qu'un thread, donc on peut
+    sans problème en créer beaucoup
+  - la coordination des acteurs peut être compliquée (chacun a son propre état
+    isolé); certaines implémentations le permettent à un plus "haut niveau" via
+    une stratégie d'échange de messages de coordination, par example via un
+    "transactor", acteur qui émule des opérations "transactionnelles" entre
+    plusieurs acteurs, ce qui se déroule un peu comme dans le modèle "Shared
+    Transaction Memory"
 * concurrence basée sur Events
   ...
 * autres modèles de concurrence

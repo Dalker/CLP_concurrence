@@ -60,7 +60,7 @@ bifurcations vers d'autres
   temps maximal (courant dans les systèmes embarqués)
 * paradigmes / "programming patterns"
   entre autres:
-  - pour du code asynchrone, privilégier les /futures/ et "promesses" aux callbacks
+  - pour du code asynchrone, privilégier les /futures/ et /promises/ aux callbacks
   - "programmation réactive"
   - Acteurs de Hewitt
   - algèbre de processus, par exemple CSP de Hoare ou CCS de Milner
