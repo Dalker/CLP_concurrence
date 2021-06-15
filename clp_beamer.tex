@@ -114,27 +114,7 @@
   (code Python ou Java)
 \end{frame}
 
-\section{Autres paradigmes concurrents}
-\begin{frame}
-  \frametitle{Autres paradigmes concurrents}
-  \begin{itemize}
-  \item Transactions
-  \item Acteurs
-  \item Événements
-  \item Coroutines
-  \end{itemize}
-\end{frame}
-\begin{frame}
-  \frametitle{Transactions}
-  \begin{itemize}
-  \item Rendre ``atomique'' la section critique
-  \item Idée inspirée des Bases de Donnée
-  \item Idée très bien exploitée dans le langage \textbf{Clojure}
-    \begin{center}
-      [bout de code Clojure]
-    \end{center}
-  \end{itemize}
-\end{frame}
+\section{Modèle d'Acteurs de Hewitt}
 \begin{frame}
   \frametitle{Éviter la mémoire partagée?}
   \begin{itemize}
@@ -142,7 +122,7 @@
   \item Les communications ne devraient se faire que par des \textbf{immuables}
   \end{itemize}
 \end{frame}
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Modèle d'Acteurs de Hewitt}
   Un \textbf{acteur} peut:
   \begin{itemize}
@@ -150,45 +130,76 @@
   \item Créer d'autres acteurs
   \item Décider de son comportement à la prochaine réception de message
   \end{itemize}
-  $\rightarrow$ le langage \textbf{Erlang} exploite bien ce modèle
+\end{frame}
+\begin{frame}[fragile]
+  \frametitle{Modèle d'Acteurs de Hewitt}
+  Le langage \textbf{Erlang} exploite bien ce modèle.
   \begin{center}
-    [bout de code Erlang]
-  \end{center}
-  Plus récemment, le langage \textbf{Scala} s'y prête aussi
-  \begin{center}
-    [micro-bout de code Scala?]
-  \end{center}
+\begin{lstlisting}[language=erlang]
+-module(acteur).
+-export([start/0, machin/0]).
+
+machin() ->
+    receive
+        hello ->
+            io:format("Machin dit bonjour.~n", [])
+    end.
+
+start() ->
+    Machin_PID = spawn(acteur, machin, []),
+    Machin_PID ! hello.
+\end{lstlisting}
+\end{center}
+  Plus récemment, le langage \textbf{Scala} utilise ce même modèle, à travers le
+  ``toolkit'' \textbf{Akka}.
 \end{frame}
 \begin{frame}
-  \frametitle{Modèle d'Acteurs de Hewitt}  
-  $\rightarrow$ ce modèle se prête bien à une analyse formelle ($\pi$-calculus,
-  réseaux de Petri, \ldots)
-  \par
-  \begin{center}
-        [image de réseau de Petri / bout de $\pi$-calculus]    
-  \end{center}
+  \frametitle{Modèle d'Acteurs de Hewitt}
+  Le modèle d'acteurs a influencé le \textbf{$\pi$-calculus} (algèbre de processus)
+  \par\bigskip
+  \begin{quotation}\small
+    Now, the pure $\lambda$-calculus is built with just two kinds of thing: terms
+    and variables. Can we achieve the same economy for a process calculus? Carl
+    Hewitt, with his actors model, responded to this challenge long ago; he
+    declared that a value, an operator on values, and a process should all be
+    the same kind of thing: an actor.
+
+    (\ldots)
+    
+    So, in the spirit of Hewitt, our first step is to demand that all things
+    denoted by terms or accessed by names—values, registers, operators,
+    processes, objects—are all of the same kind of thing; they should all be
+    processes.
+  \end{quotation}
+  \hfill Robin Milner, inventeur du $\pi$-calculus (\textit{Turing Lecture} 1993)
 \end{frame}
+
+\section{Autres approches}
 \begin{frame}
-  \frametitle{Événements}
-  [section peut-être à supprimer]\medskip
-  
-  Événement: ``message'' d'origine interne ou externe, en attente d'être géré.
+  \frametitle{Autres approches}
   \begin{itemize}
+  \item{Programmation événementielle} 
+  \begin{itemize}
+  \item utile pour les GUIs, mais difficile à analyser
   \item ``event loop''
   \item ``event handlers'' (callbacks)
   \end{itemize}
-  $\rightarrow$ utile pour programmer des GUI, mais code difficile à analyser et maintenir
-\end{frame}
-\begin{frame}
-  \frametitle{Coroutines}
-  Pas besoin de threads ou process dans les modèles Acteur ou Event-driven, mais ils sont possibles.
-  \par\medskip
-  Alternative, les coroutines: des routines concurrentes dans le même thread
-  \par\smallskip
-  $\rightarrow$ exploitées à fond dans le langage \textbf{Go} (``goroutines'')
-  \begin{center}
-    [bout de code Go]
-  \end{center}
+  
+  \item{Transactions }
+  \begin{itemize}
+  \item idée inspirée des Bases de Donnée
+  \item rendre ``atomique'' la section critique
+  \item idée exploitée par exemple dans le langage \textbf{Clojure}
+  \end{itemize}
+  
+  \item{Coroutines}
+  \begin{itemize}
+  \item coroutines: des routines concurrentes pouvant ``vivre'' dans le même thread
+  \item idée exploitée par exemple dans le langage \textbf{Go} (``goroutines'')
+  \end{itemize}
+
+  \item{Réseaux de Petri} (pour la modélisation)
+  \end{itemize}
 \end{frame}
 
 \section{Conclusion}
