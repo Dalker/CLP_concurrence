@@ -1,10 +1,6 @@
 """
 Test comparatif entre différentes méthodes de concurrence.
 
-Ce module compare un "Future fait à la main" à partir de locks avec les Futures
-pré-implémentés par Python, en multi-thread et multi-proc, le tout comparé avec
-un programme séquentiel.
-
 Les tests sont faits avec un test de primalité, intensif en calcul CPU. On
 s'attend donc à ce que le multi-process soit plus efficace.
 
@@ -29,7 +25,7 @@ def is_prime(n):
     return True
 
 
-def seq_test():
+def sequentiel():
     """Tester primalité de manière séquentielle."""
     res = []
     for i in range(len(a)):
@@ -37,9 +33,9 @@ def seq_test():
     return res
 
 
-def future_Threads_import_test():
-    """Tester primalité avec Futures de librairie standard en multi-thread."""
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+def future_Threads():
+    """Tester primalité avec Futures en multi-thread."""
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         define_calls = (executor.submit(is_prime, i) for i in a)
         res = []
         for future in concurrent.futures.as_completed(define_calls):
@@ -47,9 +43,9 @@ def future_Threads_import_test():
     return res
 
 
-def future_Processes_import_test():
-    """Tester primalité avec Futures de librairie standard en multi-process."""
-    with concurrent.futures.ProcessPoolExecutor(max_workers=5) as executor:
+def future_Processes():
+    """Tester primalité avec Futures en multi-process."""
+    with concurrent.futures.ProcessPoolExecutor() as executor:
         define_calls = (executor.submit(is_prime, i) for i in a)
         res = []
         for future in concurrent.futures.as_completed(define_calls):
@@ -60,12 +56,14 @@ def future_Processes_import_test():
 if __name__ == "__main__":
     # 10 tests sur le même calcul
     a = [67280421310721 for _ in range(10)]
-    for f in [future_Processes_import_test, seq_test,
-              future_Threads_import_test]:
+    print("\nVérification 10 fois de la primalité de 67280421310721")
+    for f in [sequentiel,
+              future_Threads,
+              future_Processes]:
         start = time.time()
-        print("\nJe vérifie les nombres premiers avec la fonction", f.__name__)
+        print("\n", f.__name__, ":")
         result = zip(a, f())
         # for nb, prime in res:
         #    print(nb, prime)
         end = time.time()
-        print("\n", "Time elapsed:", end - start)
+        print("{:.2f}s".format(end - start))

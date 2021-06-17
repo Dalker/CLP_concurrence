@@ -43,33 +43,54 @@
 
 \section{Introduction}
 \begin{frame}
-  \frametitle{Introduction: la concurrence en-dehors de l'informatique}
+  \frametitle{Introduction: la concurrence en nous}
   \begin{itemize}
   \item le cerveau est intrinsèquement parallèle
-   \begin{itemize}
-   \item traitement du stimuli visuel
-   \item traitement du stimuli auditif
-   \item traitement de la syntaxe
-   \item découverte de la sémantique
-   \item analyse du sens
-   \item comparaison avec les connaissances mémorisées
-   \item critique
-  \end{itemize}
-  % \item les rails
-  \item Un processeur est intrinsèquement séquentiel
-   \begin{itemize}
-   \item exécute une instruction à la fois
-   \item premiers ordinateurs: un seul programme à la fois
-   \item Plusieurs raisons pour développer parallélisme, concurrence
-   \item interruptions pour gérer les I/O, l'horloge, etc.
-   \item pouvoir exécuter plusieurs programmes "simultanément"
-   \item multiplication des coeurs dans les processeurs
-   \item Comment gérer la concurrence dans un processeur?
-  \end{itemize}
-
-  \item \ldots
+% A l'image un texte, de la musique, le narrateur parle. Ce mot est rouge. Ce mot est bleu. Ce mot est vert.
+  \item traitement du stimuli visuel
+% L'image perçue est décodée pour en extraire les lettres qui sont regroupées en mots.
+  \item traitement du stimuli auditif
+% Le son perçu est décodé pour en extraire la musique, les phonèmes qui sont regroupés en mots.
+  \item traitement de la syntaxe
+% Les mots sont associés selon la valeur grammaticale de chacun pour en faire des phrases.
+  \item découverte de la sémantique
+% Les phrases sont associées à une sémantique qui nous permet de comprendre des idées.
+  \item analyse du sens
+% Les idées sont analysées pour les mettres en relation.
+  \item comparaison avec les connaissances mémorisées $\rightarrow$ critique
+% Les idées conformes à ce qu'on "sait" déjà seront favorisées, les autres seront analysées plus minucieusement.
   \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{Introduction: La séquence dans l'ordinateur}
+  \begin{itemize}
+  \item Un processeur est intrinsèquement séquentiel
+% A l'image une machine de Turing, silence
+  \item exécute une instruction à la fois
+  \item premiers ordinateurs: un seul programme à la fois
+  \item Plusieurs raisons pour développer parallélisme, concurrence
+  \item interruptions pour gérer les I/O, l'horloge, etc.
+  \item pouvoir exécuter plusieurs programmes "simultanément"
+  \item multiplication des coeurs dans les processeurs
+  \item Comment gérer la concurrence dans un processeur?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Introduction: L'OS}
+  \begin{itemize}
+  \item abstraction logicielle pour rendre l'ordinateur concurent
+  \item ordonnanceur répartit le temps processeur
+  \item chaque tâche voit un coeur un certain temps
+  \item changement de contexte donne la main à une autre tâche
+  \item gain de fonctionnalités et performances
+  \item problèmes en cas de partage de ressources
+  \item I/O, mémoire, etc.
+  \item 
+  \end{itemize}
+\end{frame}
+
 
 \section{Les fondamentaux de la concurrence}
 \begin{frame}
