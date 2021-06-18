@@ -47,6 +47,7 @@
 \title{La Concurrence}
 \subtitle{Concepts de Langages de Programmation}
 \author{Juan-Carlos Barros et Daniel Kessler}
+\date{juin 2021}
 % et c'est parti
 \begin{document}
 \begin{frame}
@@ -182,7 +183,7 @@
   \end{minipage}
 \end{frame} % problèmes et solutions
 \begin{frame}
-  \frametitle{Problème 1: Entrelacement (interleaving)}
+  \frametitle{Problème 1: \textbf{interleaving} (``entrelacement'')}
   Déterminisme ou indéterminisme?
   \begin{itemize}
   \item programme séquentiel: toujours déterministe
@@ -195,7 +196,7 @@
   \end{itemize}
 \end{frame} % interleaving
 \begin{frame} 
-  \frametitle{Problème 2: la \textbf{Race Condition}}
+  \frametitle{Problème 2: \textbf{race condition}}
   \begin{minipage}{.49\textwidth}
     \begin{itemize}
     \item Exemple 1 (Java): corruption de données pour un compteur partagé par
@@ -208,7 +209,7 @@
   \end{minipage}
 \end{frame} % race condition
 \begin{frame}
-  \frametitle{Solution 1: le \textbf{verrou} (lock)}
+  \frametitle{Solution 1: \textbf{verrou} (lock)}
   Un \textbf{verrou} limite l'accès d'une ressource à une seule tâche.
   \begin{itemize}
   \item état fermé vs. état ouvert
@@ -218,7 +219,7 @@
   \end{itemize}
 \end{frame} % verrou
 \begin{frame}
-  \frametitle{Solution 2: le \textbf{sémaphore} de Dijkstra}
+  \frametitle{Solution 2: \textbf{sémaphore} de Dijkstra}
   \begin{minipage}{.7\textwidth}
     \begin{itemize}
     \item Inventé pour l'OS ``THE operating system''
@@ -240,7 +241,7 @@
   \end{minipage}
 \end{frame} % sémaphore
 \begin{frame}
-  \frametitle{Solution 3: Moniteur de Hoare}
+  \frametitle{Solution 3: \textbf{moniteur} de Hoare}
   \begin{minipage}{.49\textwidth}
     \begin{itemize}
     \item Inventé pour \textit{Equivalent Pascal} et \textit{Solo operating
@@ -259,7 +260,7 @@
   \end{minipage}
 \end{frame} % moniteur
 \begin{frame}[fragile]
- \frametitle{Solution 3: Moniteur de Hoare}
+ \frametitle{Solution 3: \textbf{moniteur} de Hoare}
  \begin{lstlisting}[language=Java]
 public class SynchronizedCounter {
   private int c = 0;
@@ -278,23 +279,26 @@ public class SynchronizedCounter {
 }
 \end{lstlisting}
 \end{frame}
-% \begin{frame}
-%   \frametitle{Problème 3: Interblocage, Famine, Inversion de Priorité}
-%   \begin{minipage}{.7\textwidth}
-%     Verrous, etc. $\Rightarrow$ nouveaux problèmes!\ldots
-%     \begin{itemize}
-%     \item Deux tâches pourraient chacune verrouiller une ressource dont l'autre
-%       à besoin $\rightarrow$ \textbf{interblocage}
-%     \item Une tâche attend indéfiniment une ressouce bloquée $\rightarrow$
-%       \textbf{famine}
-%     \item Une tâche prioritaire bloquée cède sa place à une tâche de priorité
-%       faible $\rightarrow$ \textbf{inversion de priorité}
-%     \end{itemize}
-%   \end{minipage}
-%   \begin{minipage}{.29\textwidth}
-%     \includegraphics[.3\textwidth]{philosophes.png}
-%   \end{minipage}
-% \end{frame} % interblocage et famine
+\begin{frame}
+  \frametitle{Problème 3: \textbf{interblocage} et \textbf{famine}}
+  \begin{minipage}{.55\textwidth}
+    Verrous, etc. $\Rightarrow$ nouveaux problèmes!\ldots
+    \bigskip
+    \begin{itemize}
+     \item Deux tâches pourraient chacune verrouiller une ressource dont l'autre
+       à besoin\par
+       $\rightarrow$ \textbf{interblocage}
+     \item Une tâche attend indéfiniment une ressouce bloquée\par
+       $\rightarrow$ \textbf{famine}
+     %\item Une tâche prioritaire bloquée cède sa place à une tâche de priorité
+     %  faible $\rightarrow$ \textbf{inversion de priorité}
+    \end{itemize}
+  \end{minipage}
+  \;\;
+  \begin{minipage}{.39\textwidth}
+    \includegraphics[width=.7\textwidth]{philosophes.png}
+  \end{minipage}
+\end{frame} % interblocage et famine
 \begin{frame}
   \frametitle{Solutions 4: Futures et Promises}
   % \begin{minipage}{.5\textwidth}
