@@ -45,94 +45,203 @@
 \begin{frame}
   \frametitle{Introduction: la concurrence en-dehors de l'informatique}
   \begin{itemize}
-  \item le cerveau est intrinsèquement parallèle
-   \begin{itemize}
-   \item traitement du stimuli visuel
-   \item traitement du stimuli auditif
-   \item traitement de la syntaxe
-   \item découverte de la sémantique
-   \item analyse du sens
-   \item comparaison avec les connaissances mémorisées
-   \item critique
+  \item Définition
+  \item Cerveau vs CPU
+  \item L'OS
   \end{itemize}
-  % \item les rails
-  \item Un processeur est intrinsèquement séquentiel
-   \begin{itemize}
-   \item exécute une instruction à la fois
-   \item premiers ordinateurs: un seul programme à la fois
-   \item Plusieurs raisons pour développer parallélisme, concurrence
-   \item interruptions pour gérer les I/O, l'horloge, etc.
-   \item pouvoir exécuter plusieurs programmes "simultanément"
-   \item multiplication des coeurs dans les processeurs
-   \item Comment gérer la concurrence dans un processeur?
-  \end{itemize}
-
-  \item \ldots
-  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Définition} La \textbf{programmation concurrente} est une forme de
+  programmation dans laquelle plusieurs tâches sont exécutées simultanément
+  (pendant des périodes qui se chevauchent) au lieu de séquentiellement (l’une
+  démarrant après la fin de l’autre).
+\end{frame}
+\begin{frame}
+  \frametitle{La concurrence est en nous}
+  Le \tetxbf{cerveau} est intrisèquement \textbf{concurrent}.
+  \begin{minipage}{.5\linewidth}
+    \begin{itemize}
+    \item traitement du stimulus visuel
+    \item traitement du stimulus auditif
+    \item traitement de la syntaxe, grammaire puis sémantique
+    \item analyse du sens
+    \item comparaison avec les connaissances mémorisées
+    \item critique
+    \end{itemize}
+  \end{minipage}
+  \begin{minipage}{.5\linewidth}
+    \LARGE
+    \vfill
+    Ce mot est \color{green}{rouge}.
+    \vfill
+    Ce mot est \color{blue}{vert}.
+    \vfill
+    Ce mot est \color{red}{bleu}.
+    \vfill
+  \end{minipage}
+\end{frame}
+\begin{frame}
+  \frametitle{La séquence est dans l'ordinateur}
+  Le \textbf{processeur} est intrinsèquement \textbf{séquentiel}.
+  \begin{minipage}{.5\linewidth}
+    \begin{itemize}
+    \item Une instruction exécutée à la fois
+    \item Pourquoi chercher la concurrence?
+      \begin{itemize}
+      \item Interruptions I/O
+      \item Exécuter plusieurs programmes ``simultanément''
+      \item Systèmes distribués
+      \end{itemize}
+    \end{itemize}
+  \end{minipage}
+  \begin{minipage}{.5\linewidth}
+    IMAGE PAS EXPORTABLE DU WYSIWYG JCB
+  \end{minipage}
+\end{frame}
+\begin{frame}
+  \frametitle{OS: le maître de la concurrence}
+  Le \textbf{système d'exploitation} est un ``magicien''.
+  \begin{minipage}{.5\linewidth}
+    \begin{itemize}
+    \item gestion des ressources séquentielles
+    \item couche d'abstraction
+    \item partage des ressources:\par
+      $\rightarrow$ \textbf{l'ordonnanceur}
+      \begin{itemize}
+      \item gestion des priorités
+      \item commutation des contextes
+      \item gestion des dangers de la concurrence
+      \end{itemize}
+    \end{itemize}
+  \end{minipage}
+  \begin{minipage}{.5\linewidth}
+    IMAGE PAS EXPORTABLE DU WYSIWYG JCB    
+  \end{minipage}
 \end{frame}
 
 \section{Les fondamentaux de la concurrence}
 \begin{frame}
-  \frametitle{Fondamentaux de la concurrence en informatique}
+  \frametitle{Les foncdamentaux de la concurrence}
+  Comment se manifeste la concurrence?
   \begin{itemize}
-  \item Situations en informatique où la concurrence est inévitable
-  \item Threads vs Processus
-  \item Synchrone vs Asynchrone
-  \item Problèmes classiques
-  \item Solutions classiques
+  \item multplicité des machines
+  \item multiplicité des processeurs
+  \item multiplicité des \textbf{processus}
+  \item multiplicité des \textbf{fils d'exécution} (threads)
   \end{itemize}
-\end{frame}
-\begin{frame}
-  \frametitle{Situations en informatique où la concurrence est inévitable}
+
+  Comment communiquent les différents composants?
   \begin{itemize}
-  \item Le Système d'Exploitation
-  \item Toute application distribuée (par exemple un service web)
+  \item de manière \textbf{synchrone}: contact direct
+  \item de manière \textbf{asynchrone}: message envoyé, arrivera plus tard
+  \item via des \textbf{ressources communes}: source de problème
+    \par$\rightarrow$\textbf{sections critiques}
   \end{itemize}
-\end{frame}
+\end{frame} % la concurrence, comment?
 \begin{frame}
-  \frametitle{Threads vs Processus}
+  \frametitle{Problèmes et solutions}
+  \begin{minipage}{.5\linewidth}
+    Problèmes
+    \begin{itemize}
+    \item Situation de compétition
+    \item Inversion de priorité
+    \item Entrelacement
+    \item Interblocage
+    \item Famine
+    \item etc.
+    \end{itemize}
+  \end{minipage}
+  \begin{minipage}{.5\linewidth}
+    Solutions
+    \begin{itemize}
+    \item Verrous
+    \item Atomicité
+    \item Moniteurs
+    \item Sémaphores
+    \item Futures, Promises
+    \item Autres paradigmes
+    \end{itemize}
+  \end{minipage}
+\end{frame} % problèmes et solutions
+\begin{frame} 
+  \frametitle{Problème 1: la \textbf{Race Condition}}
+  \begin{minipage}{.5\linewidth}
+    \begin{itemize}
+    \item Exemple 1 (Java): corruption de données pour un compteur partagé par
+      deux tâches concurrentes
+    \item Exemple 2 (débranché): \ldots
+    \end{itemize}
+  \end{minipage}
+  \begin{minipage}{.5\linewidth}
+    IMAGE PAS EXPORTABLE DU WYSIWIG JCB
+  \end{minipage}
+\end{frame} % race condition
+\begin{frame}
+  \frametitle{Solution 1: le \textbf{verrou} (lock)}
+  Un \textbf{verrou} limite l'accès d'une ressource à une seule tâche.
   \begin{itemize}
-  \item Processus: idéal pour déléguer des calculs intensifs
-  \item Threads: idéal pour déléguer des opérations I/O
+  \item état fermé vs. état ouvert
+  \item si le verrou est fermé, les tâches sont bloquées
+  \item sinon, une tâche qui accède à la ressource ferme le verrou
+  \item quand la tâche finit, elle ouvre le verrou
   \end{itemize}
-\end{frame}
+\end{frame} % verrou
 \begin{frame}
-  \frametitle{Communication synchrone vs asynchrone}
-  \begin{itemize}
-  \item synchrone: \ldots
-  \item asynchrone: \ldots
-  \end{itemize}
-\end{frame}
-\begin{frame}
-  \frametitle{Problèmes classiques}
-  \begin{itemize}
-  \item ``race condition''
-  \item famine (starvation)
-  \item interblocage (deadlock)
-  \item $\rightarrow$ sections critiques
-  \end{itemize}
-  $\rightarrow$ ``jeu de Dekker'' pour illustrer 
-\end{frame}
-\begin{frame}
-  \frametitle{Solutions classiques}
-  \begin{itemize}
-  \item Verrous
-  \item Sémaphores de Dijkstra
-  \item Moniteurs
-  \item Futures/Promises
-  \end{itemize}
-\end{frame}
-\begin{frame}
-  \frametitle{Solutions classiques}
-  Le langage de modélisation graphique \textbf{UML} se prête bien à décrire ce
-  genre d'outil.
-  \par
-  \includegraphics[width=.7\textwidth]{monitor.png}
-\end{frame}
-\begin{frame}
-  \frametitle{Exemple d'implémentation}
-  (code Python ou Java)
-\end{frame}
+  \frametitle{Solution 2: le \textbf{sémaphore} de Dijkstra}
+  \begin{minipage}{.8\linewidth}
+    \begin{itemize}
+    \item Inventé pour l'OS ``THE operating system''
+    \item Compteur de tâches en attente de la ressource
+    \item 3 primitives
+      \begin{itemize}
+      \item \texttt{Init(sem, max)} définit nombres d'utilisateurs max
+      \item \code{P(sem)} pour accéder à la ressource
+      \item \code{V(sem)} pour quitter la ressource
+      \end{itemize}
+    \item \texttt{P(sem)} bloque si max atteint, sinon incrémente le compteur
+    \item \texttt{V(sem)} décrémente le compteur et notifie les tâches en
+      attente
+    \item cas particulier: \textbf{sémaphore binaire} ou \textbf{mutex} quand \texttt{max=1}.
+    \end{itemize}
+  \end{minipage}
+  \begin{minipage}{.3\linewidth}
+    IMAGE PAS EXPORTABLE DU WYSIWIG JCB
+  \end{minipage}
+\end{frame} % sémaphore
+\begin{frame} 
+  \frametitle{Solution 3: Moniteur de Hoare}
+  \begin{minipage}{.5\linewidth}
+    \begin{itemize}
+    \item Inventé pour \textit{Equivalent Pascal} et \textit{Solo operating
+        system}
+    \item Verrou avec une ou plusieurs \textbf{conditions}
+    \item Condition liée à \textbf{file d'attente} de processus voulant
+      accéder à une ressource
+    \item Équivalence avec sémaphores
+    \end{itemize}
+  \begin{minipage}{.5\linewidth}
+    \onslide<1>{\includegraphics[width=.5\linewidth]{monitor.png}}
+    \onslide<2>{\begin{lstlisting}[language=Java]
+      public class SynchronizedCounter {
+        private int c = 0;
+
+        public synchronized void increment() {
+          c++;
+        }
+
+        public synchronized void decrement() {
+          c--;
+        }
+
+        public synchronized int value() {
+          return c;
+        }
+      }
+    \end{lstlisting}
+    \hfill\textit{exemple Java}}
+  \end{minipage}
+  \end{minipage}
+\end{frame} % moniteur
 
 \section{Modèle d'Acteurs de Hewitt}
 \begin{frame}
