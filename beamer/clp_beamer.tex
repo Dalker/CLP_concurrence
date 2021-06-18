@@ -27,7 +27,23 @@
   columns=flexible,
   showstringspaces=False,
   literate={é}{{\'e}}1
+           {â}{{\^a}}1
 }
+\usepackage[most]{tcolorbox}
+\newtcbox{\codebox}{nobeforeafter,tcbox raise base,
+  boxrule=0pt,top=0mm,bottom=0mm,
+  right=0mm,left=0mm,arc=0pt,boxsep=1.5pt,before upper={\vphantom{dlg}},
+  % fontupper=\ttfamily, % <-- seems to have no effect
+  colback=gray!50!white,
+  }
+\robustify{\codebox}
+\newcommand\code[1]{\codebox{#1}}
+\newcommand\minitoc{
+  \begin{frame}{\secname}
+    \tableofcontents[currentsection, hideothersubsections, ] %  sectionstyle=show/show]
+  \end{frame}
+}
+
 \title{La Concurrence}
 \subtitle{Concepts de Langages de Programmation}
 \author{Juan-Carlos Barros et Daniel Kessler}
@@ -35,112 +51,114 @@
 \begin{document}
 \begin{frame}
   \titlepage
-\end{frame}
-
-\begin{frame}
-  \tableofcontents
-\end{frame}
+\end{frame} % titre
+\begin{frame}{La Concurrence}
+  \tableofcontents[hidesubsections]
+\end{frame} % toc
 
 \section{Introduction}
-\begin{frame}
-  \frametitle{Introduction: la concurrence en-dehors de l'informatique}
-  \begin{itemize}
-  \item Définition
-  \item Cerveau vs CPU
-  \item L'OS
-  \end{itemize}
-\end{frame}
-\begin{frame}
-  \frametitle{Définition} La \textbf{programmation concurrente} est une forme de
-  programmation dans laquelle plusieurs tâches sont exécutées simultanément
-  (pendant des périodes qui se chevauchent) au lieu de séquentiellement (l’une
-  démarrant après la fin de l’autre).
-\end{frame}
-\begin{frame}
-  \frametitle{La concurrence est en nous}
-  Le \tetxbf{cerveau} est intrisèquement \textbf{concurrent}.
-  \begin{minipage}{.5\linewidth}
+\minitoc
+\subsection{Définition de la concurrence}
+\begin{frame}{Définition}
+  \begin{center}
+  \begin{minipage}{.7\linewidth}    
+   La \textbf{programmation concurrente} est une forme de programmation dans
+   laquelle plusieurs \textbf{tâches} sont exécutées simultanément (pendant des périodes
+   qui se chevauchent) au lieu de séquentiellement (l’une démarrant après la fin
+   de l’autre).
+  \end{minipage}    
+  \end{center}
+\end{frame} % définition
+\subsection{Le cerveau \textit{vs}\, le \textsc{cpu}}
+\begin{frame}{La concurrence est en nous}
+  Le \textbf{cerveau} est intrisèquement \textbf{concurrent}.
+  \par\bigskip
+  \begin{minipage}{.6\textwidth}
     \begin{itemize}
-    \item traitement du stimulus visuel
-    \item traitement du stimulus auditif
-    \item traitement de la syntaxe, grammaire puis sémantique
-    \item analyse du sens
-    \item comparaison avec les connaissances mémorisées
-    \item critique
+    \item<2-> traitement du stimulus visuel
+    \item<3-> traitement du stimulus auditif
+    \item<4-> traitement de la syntaxe, grammaire puis sémantique
+    \item<5-> analyse du sens
+    \item<6-> comparaison avec les connaissances mémorisées
+    \item<7-> critique
     \end{itemize}
   \end{minipage}
-  \begin{minipage}{.5\linewidth}
-    \LARGE
-    \vfill
-    Ce mot est \color{green}{rouge}.
-    \vfill
-    Ce mot est \color{blue}{vert}.
-    \vfill
-    Ce mot est \color{red}{bleu}.
-    \vfill
-  \end{minipage}
-\end{frame}
+  \onslide<2->{\;
+  \begin{minipage}{.35\linewidth}
+    \Large
+    Ce mot est {\color{green}{rouge}}.
+    \par\bigskip
+    Ce mot est {\color{blue}{vert}}.
+    \par\bigskip
+    Ce mot est {\color{red}{bleu}}.
+    \par\bigskip\bigskip
+  \end{minipage}}
+\end{frame} % cerveau parallèle
 \begin{frame}
   \frametitle{La séquence est dans l'ordinateur}
-  Le \textbf{processeur} est intrinsèquement \textbf{séquentiel}.
-  \begin{minipage}{.5\linewidth}
+  Le \textbf{processeur} est intrinsèquement \textbf{séquentiel}.\par\bigskip
+  \begin{minipage}{.55\textwidth}
     \begin{itemize}
     \item Une instruction exécutée à la fois
-    \item Pourquoi chercher la concurrence?
+    \item<2-> Pourquoi chercher la concurrence?
       \begin{itemize}
-      \item Interruptions I/O
-      \item Exécuter plusieurs programmes ``simultanément''
-      \item Systèmes distribués
+      \item<3-> Interruptions I/O
+      \item<4-> Exécuter plusieurs programmes ``simultanément''
+      \item<5-> Systèmes distribués
       \end{itemize}
     \end{itemize}
+  \end{minipage}\quad
+  \begin{minipage}{.4\textwidth}
+    \begin{center}
+      \includegraphics[width=.8\textwidth]{turing.png}
+    \end{center}
   \end{minipage}
-  \begin{minipage}{.5\linewidth}
-    IMAGE PAS EXPORTABLE DU WYSIWYG JCB
-  \end{minipage}
-\end{frame}
+\end{frame} % cpu séquentiel
+\subsection{Le système d'exploitation}
 \begin{frame}
   \frametitle{OS: le maître de la concurrence}
   Le \textbf{système d'exploitation} est un ``magicien''.
-  \begin{minipage}{.5\linewidth}
+  \par\bigskip
+  \begin{minipage}{.55\textwidth}
     \begin{itemize}
-    \item gestion des ressources séquentielles
-    \item couche d'abstraction
-    \item partage des ressources:\par
+    \item<2-> gestion des ressources séquentielles
+    \item<3-> couches d'abstraction
+    \item<4-> partage des ressources:\par
       $\rightarrow$ \textbf{l'ordonnanceur}
       \begin{itemize}
-      \item gestion des priorités
-      \item commutation des contextes
-      \item gestion des dangers de la concurrence
+      \item<5-> gestion des priorités
+      \item<6-> commutation des contextes
+      % \item gestion des dangers de la concurrence
       \end{itemize}
     \end{itemize}
   \end{minipage}
-  \begin{minipage}{.5\linewidth}
-    IMAGE PAS EXPORTABLE DU WYSIWYG JCB    
+  \begin{minipage}{.44\textwidth}
+    \begin{center}
+      \includegraphics[width=.7\textwidth]{os.png}
+    \end{center}
   \end{minipage}
-\end{frame}
+\end{frame} % l'OS
 
-\section{Les fondamentaux de la concurrence}
+\section{Mémoire partagée: un problème critique}
+\minitoc
+\subsection{Les fondamentaux de la concurrence}
 \begin{frame}
-  \frametitle{Les foncdamentaux de la concurrence}
-  Comment se manifeste la concurrence?
+  \frametitle{Les fondamentaux de la concurrence}
+  Comment se manifeste la concurrence? (répartition des tâches)
   \begin{itemize}
-  \item multplicité des machines
-  \item multiplicité des processeurs
   \item multiplicité des \textbf{processus}
   \item multiplicité des \textbf{fils d'exécution} (threads)
   \end{itemize}
-
+\par\bigskip
   Comment communiquent les différents composants?
   \begin{itemize}
-  \item de manière \textbf{synchrone}: contact direct
-  \item de manière \textbf{asynchrone}: message envoyé, arrivera plus tard
-  \item via des \textbf{ressources communes}: source de problème
-    \par$\rightarrow$\textbf{sections critiques}
+  \item via des \textbf{ressources communes}
   \end{itemize}
 \end{frame} % la concurrence, comment?
+\subsection{Problèmes et solutions}
 \begin{frame}
   \frametitle{Problèmes et solutions}
-  \begin{minipage}{.5\linewidth}
+  \begin{minipage}{.49\textwidth}
     Problèmes
     \begin{itemize}
     \item Situation de compétition
@@ -151,29 +169,42 @@
     \item etc.
     \end{itemize}
   \end{minipage}
-  \begin{minipage}{.5\linewidth}
+  \begin{minipage}{.49\textwidth}
     Solutions
     \begin{itemize}
     \item Verrous
-    \item Atomicité
-    \item Moniteurs
-    \item Sémaphores
-    \item Futures, Promises
-    \item Autres paradigmes
+    \item L'Atomicité
+    \item Les Moniteurs
+    \item Les Sémaphores
+    \item Futures et Promises
+    \item Et d'autres paradigmes
     \end{itemize}
   \end{minipage}
 \end{frame} % problèmes et solutions
+\begin{frame}
+  \frametitle{Problème 1: Entrelacement (interleaving)}
+  Déterminisme ou indéterminisme?
+  \begin{itemize}
+  \item programme séquentiel: toujours déterministe
+  \item programme concurrent: peut être déterministe
+    \par$\rightarrow$
+    toutes les possibilités d'entrelacement doivent été prises en compte!
+    \par$\rightarrow$
+    prouver la validité d'un programme concurrent est particulièrement ardu!
+  \item Si le résultat dépend de l'ordre d'exécution, le déterminisme est perdu
+  \end{itemize}
+\end{frame} % interleaving
 \begin{frame} 
-  \frametitle{Problème 1: la \textbf{Race Condition}}
-  \begin{minipage}{.5\linewidth}
+  \frametitle{Problème 2: la \textbf{Race Condition}}
+  \begin{minipage}{.49\textwidth}
     \begin{itemize}
     \item Exemple 1 (Java): corruption de données pour un compteur partagé par
       deux tâches concurrentes
     \item Exemple 2 (débranché): \ldots
     \end{itemize}
   \end{minipage}
-  \begin{minipage}{.5\linewidth}
-    IMAGE PAS EXPORTABLE DU WYSIWIG JCB
+  \begin{minipage}{.49\textwidth}
+    \includegraphics[width=.7\textwidth]{race-condition.png}
   \end{minipage}
 \end{frame} % race condition
 \begin{frame}
@@ -188,15 +219,15 @@
 \end{frame} % verrou
 \begin{frame}
   \frametitle{Solution 2: le \textbf{sémaphore} de Dijkstra}
-  \begin{minipage}{.8\linewidth}
+  \begin{minipage}{.7\textwidth}
     \begin{itemize}
     \item Inventé pour l'OS ``THE operating system''
     \item Compteur de tâches en attente de la ressource
     \item 3 primitives
       \begin{itemize}
       \item \texttt{Init(sem, max)} définit nombres d'utilisateurs max
-      \item \code{P(sem)} pour accéder à la ressource
-      \item \code{V(sem)} pour quitter la ressource
+      \item \texttt{P(sem)} pour accéder à la ressource
+      \item \texttt{V(sem)} pour quitter la ressource
       \end{itemize}
     \item \texttt{P(sem)} bloque si max atteint, sinon incrémente le compteur
     \item \texttt{V(sem)} décrémente le compteur et notifie les tâches en
@@ -204,13 +235,13 @@
     \item cas particulier: \textbf{sémaphore binaire} ou \textbf{mutex} quand \texttt{max=1}.
     \end{itemize}
   \end{minipage}
-  \begin{minipage}{.3\linewidth}
-    IMAGE PAS EXPORTABLE DU WYSIWIG JCB
+  \begin{minipage}{.28\textwidth}
+    \includegraphics[width=.7\textwidth]{semaphore.png}
   \end{minipage}
 \end{frame} % sémaphore
-\begin{frame} 
+\begin{frame}
   \frametitle{Solution 3: Moniteur de Hoare}
-  \begin{minipage}{.5\linewidth}
+  \begin{minipage}{.49\textwidth}
     \begin{itemize}
     \item Inventé pour \textit{Equivalent Pascal} et \textit{Solo operating
         system}
@@ -219,38 +250,164 @@
       accéder à une ressource
     \item Équivalence avec sémaphores
     \end{itemize}
-  \begin{minipage}{.5\linewidth}
-    \onslide<1>{\includegraphics[width=.5\linewidth]{monitor.png}}
-    \onslide<2>{\begin{lstlisting}[language=Java]
-      public class SynchronizedCounter {
-        private int c = 0;
-
-        public synchronized void increment() {
-          c++;
-        }
-
-        public synchronized void decrement() {
-          c--;
-        }
-
-        public synchronized int value() {
-          return c;
-        }
-      }
-    \end{lstlisting}
-    \hfill\textit{exemple Java}}
   \end{minipage}
+  \begin{minipage}{.49\textwidth}
+    \begin{center}
+    \only<1>{\includegraphics[width=.5\textwidth]{monitor2.png}}
+    \only<2>{\includegraphics[width=.9\textwidth]{monitor.png}}      
+    \end{center}
   \end{minipage}
 \end{frame} % moniteur
+\begin{frame}[fragile]
+ \frametitle{Solution 3: Moniteur de Hoare}
+ \begin{lstlisting}[language=Java]
+public class SynchronizedCounter {
+  private int c = 0;
 
-\section{Modèle d'Acteurs de Hewitt}
+  public synchronized void increment() {
+    c++;
+  }
+
+  public synchronized void decrement() {
+    c--;
+  }
+
+  public synchronized int value() {
+    return c;
+  }
+}
+\end{lstlisting}
+\end{frame}
+% \begin{frame}
+%   \frametitle{Problème 3: Interblocage, Famine, Inversion de Priorité}
+%   \begin{minipage}{.7\textwidth}
+%     Verrous, etc. $\Rightarrow$ nouveaux problèmes!\ldots
+%     \begin{itemize}
+%     \item Deux tâches pourraient chacune verrouiller une ressource dont l'autre
+%       à besoin $\rightarrow$ \textbf{interblocage}
+%     \item Une tâche attend indéfiniment une ressouce bloquée $\rightarrow$
+%       \textbf{famine}
+%     \item Une tâche prioritaire bloquée cède sa place à une tâche de priorité
+%       faible $\rightarrow$ \textbf{inversion de priorité}
+%     \end{itemize}
+%   \end{minipage}
+%   \begin{minipage}{.29\textwidth}
+%     \includegraphics[.3\textwidth]{philosophes.png}
+%   \end{minipage}
+% \end{frame} % interblocage et famine
+\begin{frame}
+  \frametitle{Solutions 4: Futures et Promises}
+  % \begin{minipage}{.5\textwidth}
+  Les \textbf{Futures} et \textbf{Promises} sont des abstractions
+  de plus haut niveau que les verrous, sémaphores ou moniteurs.
+  \begin{itemize}
+  \item Ils facilitent la programmation
+  \item Ils gèrent les problèmes usuels
+  \end{itemize}
+\end{frame} % futures
+\begin{frame}[fragile]{Future en Scala}
+  \begin{lstlisting}[language=Scala]
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
+
+object ScalaFuture extends App {
+
+  val finiraPlusTard = Future {
+    ... // tâche longue
+  }
+
+  finiraPlusTard.onComplete {
+    case Success(valeur) => traiterValeurDeRetour(valeur)
+    case Failure(exception) => gererException(exception)
+  }
+
+  Thread.sleep(2000)  // "garder en vie" le runtime
+}
+  \end{lstlisting}
+\end{frame}
+\begin{frame}[fragile]{Promise en javascript}
+  \begin{lstlisting}[language=java]
+const promise = doSomething();
+
+doSomething()
+  .then(result => doSomethingElse(result))
+  .then(newResult => doThirdThing(newResult))
+  .then(finalResult => {
+       console.log("Got the final result: ${finalResult}");
+    })
+  .catch(failureCallback);
+  \end{lstlisting}
+\end{frame}
+\begin{frame}
+  \frametitle{OS: le maître de la concurrence}
+  Le \textbf{système d'exploitation} est un ``magicien''.
+  \par\bigskip
+  \begin{minipage}{.55\textwidth}
+    \begin{itemize}
+    \item gestion des ressources séquentielles
+    \item couches d'abstraction
+    \item partage des ressources:\par
+      $\rightarrow$ \textbf{l'ordonnanceur}
+      \begin{itemize}
+      \item gestion des priorités
+      \item commutation des contextes
+      \item<2-> gestion des dangers de la concurrence
+      \end{itemize}
+    \end{itemize}
+  \end{minipage}
+  \begin{minipage}{.44\textwidth}
+    \begin{center}
+      \includegraphics[width=.7\textwidth]{os.png}
+    \end{center}
+  \end{minipage}
+\end{frame} % l'OS
+\subsection{Implémentation: deux situations avec trois approches}
+\begin{frame}{Futures en Python}
+  Comparaison de deux situations\ldots
+  \begin{itemize}
+  \item Calcul intensif
+  \item I/O avec latence
+  \end{itemize}
+\bigskip
+\onslide<2->{\ldots en utilisant trois approches:
+  \begin{itemize}
+  \item séquentielle
+  \item concurrente par \textit{threads} (garantis non parallélisés)
+  \item concurrente par \textit{process} (garantis parallélisés)
+  \end{itemize}
+  }
+\end{frame}
+
+\section{Changement de paradigme}
+\minitoc
+\subsection{Les fondamentaux de la concurrence (2)}
+\begin{frame}
+  \frametitle{Les fondamentaux de la concurrence (2)}
+  Comment se manifeste la concurrence? (répartition des tâches)
+  \begin{itemize}
+  \item multiplicité des \textbf{fils d'exécution} (threads)
+  \item multiplicité des \textbf{processus}
+  \item<2-> multiplicité des processeurs
+  \item<2-> multiplicité des machines
+  \end{itemize}
+
+  Comment communiquent les différents composants?
+  \begin{itemize}
+  \item via des \textbf{ressources communes}
+  \item<3-> de manière \textbf{synchrone}: transmission d'information directe
+  \item<3-> de manière \textbf{asynchrone}: transmission d'information indirecte
+  \end{itemize}
+\end{frame} % la concurrence, comment?
 \begin{frame}
   \frametitle{Éviter la mémoire partagée?}
   \begin{itemize}
-  \item La mémoire partagée est la source de la plupart des problèmes
+  \item La mémoire partagée était la source de la plupart des problèmes
+    \bigskip
   \item Les communications ne devraient se faire que par des \textbf{immuables}
   \end{itemize}
 \end{frame}
+\subsection{Modèle d'Acteurs de Hewitt}
 \begin{frame}[fragile]
   \frametitle{Modèle d'Acteurs de Hewitt}
   Un \textbf{acteur} peut:
@@ -266,17 +423,17 @@
   \begin{center}
 \begin{lstlisting}[language=erlang]
 -module(acteur).
--export([start/0, machin/0]).
+-export([start/0, alice/0]).
 
-machin() ->
+alice() ->
     receive
         hello ->
-            io:format("Machin dit bonjour.~n", [])
+            io:format("Alice dit bonjour.~n", [])
     end.
 
 start() ->
-    Machin_PID = spawn(acteur, machin, []),
-    Machin_PID ! hello.
+    Alice_PID = spawn(acteur, alice, []),
+    Alice_PID ! hello.
 \end{lstlisting}
 \end{center}
   Plus récemment, le langage \textbf{Scala} utilise ce même modèle, à travers le
@@ -286,6 +443,7 @@ start() ->
   \frametitle{Modèle d'Acteurs de Hewitt}
   Le modèle d'acteurs a influencé le \textbf{$\pi$-calculus} (algèbre de processus)
   \par\bigskip
+  \only<2>{
   \begin{quotation}\small
     Now, the pure $\lambda$-calculus is built with just two kinds of thing: terms
     and variables. Can we achieve the same economy for a process calculus? Carl
@@ -300,7 +458,13 @@ start() ->
     processes, objects—are all of the same kind of thing; they should all be
     processes.
   \end{quotation}
-  \hfill Robin Milner, inventeur du $\pi$-calculus (\textit{Turing Lecture} 1993)
+  \hfill Robin Milner, inventeur du $\pi$-calculus (\textit{Turing Lecture}
+  1993)
+}\only<1>{
+  \begin{center}
+    \includegraphics[width=.75\textwidth]{pi-calculus.png}    
+  \end{center}
+}
 \end{frame}
 \begin{frame}[fragile]
   \frametitle{Modèle d'Acteurs de Hewitt}
@@ -310,36 +474,36 @@ start() ->
   \hfill{$\rightarrow$ \footnotesize{}cf. \textit{On the duality of operating system structures}
     H. Lauer, R. Needham 1978}
 \end{frame}
-
-\section{Autres approches}
+\subsection{Autres approches}
 \begin{frame}
   \frametitle{Autres approches}
   \begin{itemize}
-  \item{Programmation événementielle} 
+  \item<1->Programmation événementielle
   \begin{itemize}
   \item utile pour les GUIs, mais difficile à analyser
   \item ``event loop''
   \item ``event handlers'' (callbacks)
   \end{itemize}
   
-  \item{Transactions }
+  \item<2->Transactions
   \begin{itemize}
-  \item idée inspirée des Bases de Donnée
+  \item idée inspirée des Bases de Donnée (langage \textbf{SQL})
   \item rendre ``atomique'' la section critique
   \item idée exploitée par exemple dans le langage \textbf{Clojure}
   \end{itemize}
   
-  \item{Coroutines}
+  \item<3->Coroutines
   \begin{itemize}
   \item coroutines: des routines concurrentes pouvant ``vivre'' dans le même thread
   \item idée exploitée par exemple dans le langage \textbf{Go} (``goroutines'')
   \end{itemize}
 
-  \item{Réseaux de Petri} (pour la modélisation)
+  \item<4->Réseaux de Petri (pour la modélisation)
   \end{itemize}
 \end{frame}
 
 \section{Conclusion}
+\minitoc
 \begin{frame}
   \frametitle{Conclusion: au-delà de la concurrence}
   Réseaux de neurone!
