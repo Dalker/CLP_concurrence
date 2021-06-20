@@ -28,6 +28,8 @@
   showstringspaces=False,
   literate={é}{{\'e}}1
            {â}{{\^a}}1
+           {à}{{\`a}}1
+           {ç}{{\c c}}1
 }
 \usepackage[most]{tcolorbox}
 \newtcbox{\codebox}{nobeforeafter,tcbox raise base,
@@ -43,6 +45,7 @@
     \tableofcontents[currentsection, hideothersubsections, ] %  sectionstyle=show/show]
   \end{frame}
 }
+\newcommand\ignore[1]{}
 
 \title{La Concurrence}
 \subtitle{Concepts de Langages de Programmation}
@@ -64,8 +67,8 @@
   \begin{center}
     \begin{minipage}{.7\linewidth}
       La \textbf{concurrence} en informatique consiste en l'exécution de
-      plusieurs \textbf{tâches} exécutées de manière simultanée (pendant des
-      périodes qui se chevauchent) au lieu de séquentiellement (l’une démarrant
+      plusieurs \textbf{tâches} simultanément (pendant des
+      périodes qui se chevauchent) plutôt que séquentiellement (l’une démarrant
       après la fin de l’autre).
     \end{minipage}    
   \end{center}
@@ -197,15 +200,16 @@
 \end{frame} % interleaving
 \begin{frame} 
   \frametitle{Problème 2: \textbf{race condition}}
-  \begin{minipage}{.49\textwidth}
-    \begin{itemize}
-    \item Exemple 1 (Java): corruption de données pour un compteur partagé par
-      deux tâches concurrentes
-    \item Exemple 2 (débranché): \ldots
-    \end{itemize}
+  \begin{minipage}{.48\textwidth}
+    Deux tâches pourraient tenter d'accéder à une même partie
+    de leur mémoire partagée simultanément, ce qui dans la pratique
+    pourra poser problème.
   \end{minipage}
-  \begin{minipage}{.49\textwidth}
-    \includegraphics[width=.7\textwidth]{race-condition.png}
+  \quad
+  \begin{minipage}{.45\textwidth}
+    \begin{center}
+      \includegraphics[width=.7\textwidth]{race-condition.png}      
+    \end{center}
   \end{minipage}
 \end{frame} % race condition
 \begin{frame}
@@ -241,7 +245,7 @@
   \end{minipage}
 \end{frame} % sémaphore
 \begin{frame}
-  \frametitle{Solution 3: \textbf{moniteur} de Hoare}
+  \frametitle{Solution 3: \textbf{moniteur} (Hoare / Brinch-Hansen)}
   \begin{minipage}{.49\textwidth}
     \begin{itemize}
     \item Inventé pour \textit{Equivalent Pascal} et \textit{Solo operating
@@ -259,9 +263,8 @@
     \end{center}
   \end{minipage}
 \end{frame} % moniteur
-\begin{frame}[fragile]
- \frametitle{Solution 3: \textbf{moniteur} de Hoare}
- \begin{lstlisting}[language=Java]
+\begin{frame}[containsverbatim]{Solution 3: \textbf{moniteur} (Hoare / Brinch-Hansen)}
+\begin{lstlisting}[language=Java]
 public class SynchronizedCounter {
   private int c = 0;
 
@@ -277,8 +280,8 @@ public class SynchronizedCounter {
     return c;
   }
 }
-\end{lstlisting}
-\end{frame}
+\end{lstlisting}}
+\end{frame} % moniteur Java
 \begin{frame}
   \frametitle{Problème 3: \textbf{interblocage} et \textbf{famine}}
   \begin{minipage}{.55\textwidth}
@@ -300,17 +303,75 @@ public class SynchronizedCounter {
   \end{minipage}
 \end{frame} % interblocage et famine
 \begin{frame}
-  \frametitle{Solutions 4: Futures et Promises}
+  \frametitle{Solution 4: Futures et Promises}
   % \begin{minipage}{.5\textwidth}
   Les \textbf{Futures} et \textbf{Promises} sont des abstractions
   de plus haut niveau que les verrous, sémaphores ou moniteurs.
+  \bigskip
+
+  Un Future/Promise est une valeur qui peut déjà être disponible, ou sinon,
+  devrait devenir disponible plus tard.
+  \bigskip
+
+  La distinction entre les deux est floue et dépend du langage de
+  programmation.
+
+  Si distinction il y a, le Future apparaît comme un objet
+  ``en lecture seule''.
+\end{frame} % futures et promises
+
+\section{Côté pratique}
+\minitoc
+\subsection{Implémenation naïve}
+\begin{frame}[containsverbatim]{Implémenation naïve d'un Future minimal en Python}
+\begin{lstlisting}
+class FutureNaif:
+  """Future implémenté "à la main", avec thread privé."""
+
+  def __init__(self, task):
+      """Initialiser un Future."""
+      self.done = False
+      self.result = None
+      self._task = task
+      # pas besoin de lock vu que le thread est créé
+      # sur place et n'est référencé nulle part ailleurs
+      self.__thread = threading.Thread(target=self._target)
+      self.__thread.start()
+
+  def _target(self):
+      """Travail à effectuer par le thread dédié."""
+      self.result = self._task()
+      self.done = True    
+\end{lstlisting}
+\end{frame}
+\subsection{Thread/Process Pools}
+\begin{frame}{Thread/Process Pools et Executors}
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{threadpool.png}
+  \end{center}
+\end{frame}
+\subsection{Tests de performance}
+\begin{frame}{Futures en Python (avec \textbf{pooling})}
+  Comparaison de deux situations\ldots
   \begin{itemize}
-  \item Ils facilitent la programmation
-  \item Ils gèrent les problèmes usuels
+  \item Calcul intensif
+  \item I/O avec latence
   \end{itemize}
-\end{frame} % futures
-\begin{frame}[fragile]{Future en Scala}
-  \begin{lstlisting}[language=Scala]
+\bigskip
+\onslide<2->{\ldots en utilisant trois approches:
+  \begin{itemize}
+  \item séquentielle
+  \item concurrente par \textit{threads} (garantis non parallélisés)
+  \item concurrente par \textit{process} (garantis parallélisés)
+  \end{itemize}
+  }
+\end{frame} % Futures en Python
+
+\section{Changement de paradigme}
+\minitoc
+\subsection{Autres manières d'utiliser des futures}
+\begin{frame}[containsverbatim]{Future avec \textbf{callback} associé (exemple en Scala)}
+\begin{lstlisting}[language=Scala]
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
@@ -328,63 +389,24 @@ object ScalaFuture extends App {
 
   Thread.sleep(2000)  // "garder en vie" le runtime
 }
-  \end{lstlisting}
-\end{frame}
-\begin{frame}[fragile]{Promise en javascript}
+\end{lstlisting}
+\end{frame} % Futures avec callbacks (Scala)
+\begin{frame}[containsverbatim]{\textbf{pipelining} de Promise (exemple en javascript)}
   \begin{lstlisting}[language=java]
-const promise = doSomething();
+function faireQuelqueChose() {
+   // ...
+     return new Promise(...)
+   }
 
-doSomething()
-  .then(result => doSomethingElse(result))
-  .then(newResult => doThirdThing(newResult))
-  .then(finalResult => {
-       console.log("Got the final result: ${finalResult}");
+faireQuelqueChose()
+  .then(x => faireAutreChose(x))
+  .then(x => faireUneTroisiemeChose(x))
+  .then(x => {
+       console.log("Résultat final reçu: ${x}");
     })
-  .catch(failureCallback);
-  \end{lstlisting}
-\end{frame}
-\begin{frame}
-  \frametitle{OS: le maître de la concurrence}
-  Le \textbf{système d'exploitation} est un ``magicien''.
-  \par\bigskip
-  \begin{minipage}{.55\textwidth}
-    \begin{itemize}
-    \item gestion des ressources séquentielles
-    \item couches d'abstraction
-    \item partage des ressources:\par
-      $\rightarrow$ \textbf{l'ordonnanceur}
-      \begin{itemize}
-      \item gestion des priorités
-      \item commutation des contextes
-      \item<2-> gestion des dangers de la concurrence
-      \end{itemize}
-    \end{itemize}
-  \end{minipage}
-  \begin{minipage}{.44\textwidth}
-    \begin{center}
-      \includegraphics[width=.7\textwidth]{os.png}
-    \end{center}
-  \end{minipage}
-\end{frame} % l'OS
-\subsection{Implémentation: deux situations avec trois approches}
-\begin{frame}{Futures en Python}
-  Comparaison de deux situations\ldots
-  \begin{itemize}
-  \item Calcul intensif
-  \item I/O avec latence
-  \end{itemize}
-\bigskip
-\onslide<2->{\ldots en utilisant trois approches:
-  \begin{itemize}
-  \item séquentielle
-  \item concurrente par \textit{threads} (garantis non parallélisés)
-  \item concurrente par \textit{process} (garantis parallélisés)
-  \end{itemize}
-  }
-\end{frame}
-
-\section{Changement de paradigme}
-\minitoc
+  .catch(gererEchec);
+\end{lstlisting}
+\end{frame} % promises enchaînées (javascript)
 \subsection{Les fondamentaux de la concurrence (2)}
 \begin{frame}
   \frametitle{Les fondamentaux de la concurrence (2)}
@@ -408,21 +430,25 @@ doSomething()
   \begin{itemize}
   \item La mémoire partagée était la source de la plupart des problèmes
     \bigskip
-  \item Les communications ne devraient se faire que par des \textbf{immuables}
+    $\Rightarrow$ l'éviter ou la cacher dans une couche d'abstraction qui la
+    gère de manière automatique et efficace
+  \item Les communications ne devraient se faire que par \textbf{messages} ou \textbf{événements}
+  \item Les messages ou événements ne devraient être constitué que de données \textbf{immuables}
   \end{itemize}
 \end{frame}
 \subsection{Modèle d'Acteurs de Hewitt}
-\begin{frame}[fragile]
-  \frametitle{Modèle d'Acteurs de Hewitt}
+\begin{frame}{Modèle d'Acteurs de Hewitt}
   Un \textbf{acteur} peut:
   \begin{itemize}
   \item Envoyer des \textbf{messages} à d'autres acteurs
   \item Créer d'autres acteurs
   \item Décider de son comportement à la prochaine réception de message
   \end{itemize}
-\end{frame}
-\begin{frame}[fragile]
-  \frametitle{Modèle d'Acteurs de Hewitt}
+\end{frame} % déf Acteurs
+% \begin{frame}{Futures dans le modèle Acteurs}
+% \end{frame} % Futures dans modèle Acteur
+\begin{frame}[containsverbatim]
+  \frametitle{Modèle d'Acteurs en Erlang}
   Le langage \textbf{Erlang} exploite bien ce modèle.
   \begin{center}
 \begin{lstlisting}[language=erlang]
@@ -442,9 +468,9 @@ start() ->
 \end{center}
   Plus récemment, le langage \textbf{Scala} utilise ce même modèle, à travers le
   ``toolkit'' \textbf{Akka}.
-\end{frame}
+\end{frame} % Erlang
 \begin{frame}
-  \frametitle{Modèle d'Acteurs de Hewitt}
+  \frametitle{Du modèle d'Acteurs au $\pi$-calcul de Milner}
   Le modèle d'acteurs a influencé le \textbf{$\pi$-calculus} (algèbre de processus)
   \par\bigskip
   \only<2>{
@@ -469,15 +495,14 @@ start() ->
     \includegraphics[width=.75\textwidth]{pi-calculus.png}    
   \end{center}
 }
-\end{frame}
-\begin{frame}[fragile]
-  \frametitle{Modèle d'Acteurs de Hewitt}
+\end{frame} % pi-calc de Milner
+\begin{frame}{Équivalence des paradigmes}
   Lauer et Needham on montré en 1978 que les modèles de concurrence basé sur
   processus et les modèles basés sur messages sont équivalents (``duaux'').
   \par\bigskip
   \hfill{$\rightarrow$ \footnotesize{}cf. \textit{On the duality of operating system structures}
     H. Lauer, R. Needham 1978}
-\end{frame}
+\end{frame} % équivalence de Lauer-Needham
 \subsection{Autres approches}
 \begin{frame}
   \frametitle{Autres approches}
