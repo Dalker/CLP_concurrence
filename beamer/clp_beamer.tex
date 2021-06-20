@@ -351,7 +351,7 @@ class FutureNaif:
   \end{center}
 \end{frame}
 \subsection{Tests de performance}
-\begin{frame}{Futures en Python (avec \textbf{pooling})}
+\begin{frame}{Tests de performance}
   Comparaison de deux situations\ldots
   \begin{itemize}
   \item Calcul intensif
@@ -429,11 +429,11 @@ faireQuelqueChose()
   \frametitle{Éviter la mémoire partagée?}
   \begin{itemize}
   \item La mémoire partagée était la source de la plupart des problèmes
-    \bigskip
+    \par\bigskip
     $\Rightarrow$ l'éviter ou la cacher dans une couche d'abstraction qui la
     gère de manière automatique et efficace
-  \item Les communications ne devraient se faire que par \textbf{messages} ou \textbf{événements}
-  \item Les messages ou événements ne devraient être constitué que de données \textbf{immuables}
+  \item<2-> Les communications ne devraient se faire que par \textbf{messages} ou \textbf{événements}
+  \item<3-> Les messages ou événements ne devraient être constitué que de données \textbf{immuables}
   \end{itemize}
 \end{frame}
 \subsection{Modèle d'Acteurs de Hewitt}
@@ -473,10 +473,10 @@ start() ->
   \frametitle{Du modèle d'Acteurs au $\pi$-calcul de Milner}
   Le modèle d'acteurs a influencé le \textbf{$\pi$-calculus} (algèbre de processus)
   \par\bigskip
-  \only<2>{
+  \only<1>{
   \begin{quotation}\small
-    Now, the pure $\lambda$-calculus is built with just two kinds of thing: terms
-    and variables. Can we achieve the same economy for a process calculus? Carl
+    Now, the pure \textbf{$\lambda$-calculus is built with just two kinds of thing: terms
+    and variables}. Can we achieve the same economy for a process calculus? Carl
     Hewitt, with his actors model, responded to this challenge long ago; he
     declared that a value, an operator on values, and a process should all be
     the same kind of thing: an actor.
@@ -485,57 +485,81 @@ start() ->
     
     So, in the spirit of Hewitt, our first step is to demand that all things
     denoted by terms or accessed by names—values, registers, operators,
-    processes, objects—are all of the same kind of thing; they should all be
-    processes.
+    processes, objects—are all of the same kind of thing; \textbf{they should all be
+    processes}.
   \end{quotation}
   \hfill Robin Milner, inventeur du $\pi$-calculus (\textit{Turing Lecture}
   1993)
-}\only<1>{
+}\only<2>{
   \begin{center}
     \includegraphics[width=.75\textwidth]{pi-calculus.png}    
   \end{center}
+  \par\bigksip\bigskip\bigskip\bigskip\bigskip\phantom+
 }
 \end{frame} % pi-calc de Milner
 \begin{frame}{Équivalence des paradigmes}
   Lauer et Needham on montré en 1978 que les modèles de concurrence basé sur
-  processus et les modèles basés sur messages sont équivalents (``duaux'').
+  procédures et les modèles basés sur messages sont équivalents (``duaux'').
   \par\bigskip
   \hfill{$\rightarrow$ \footnotesize{}cf. \textit{On the duality of operating system structures}
     H. Lauer, R. Needham 1978}
+  \par\bigskip
+  \begin{itemize}
+  \item orienté procédures:
+    \begin{itemize}
+    \item beaucoup de processus, souvent créés ou détruits
+    \item communication par mémoire partagée et par appels de fonction
+    \item synchronisation via verrous, sémaphores ou moniteurs
+    \end{itemize}
+  \item orienté messages:
+    \begin{itemize}
+    \item peu de processus, en nombre fixe et isolés
+    \item communication par messages ou événements
+    \item traitement efficace des files d'attente de messages
+    \end{itemize}
+  \end{itemize}
 \end{frame} % équivalence de Lauer-Needham
+
+\section{Conclusion}
+\minitoc
 \subsection{Autres approches}
 \begin{frame}
-  \frametitle{Autres approches}
+  \frametitle{Autres approches de la concurrence}
   \begin{itemize}
-  \item<1->Programmation événementielle
-  \begin{itemize}
-  \item utile pour les GUIs, mais difficile à analyser
-  \item ``event loop''
-  \item ``event handlers'' (callbacks)
-  \end{itemize}
+  % \item<1->Programmation événementielle
+  % \begin{itemize}
+  % \item utile pour les GUIs, mais difficile à analyser
+  % \item ``event loop''
+  % \item ``event handlers'' (callbacks)
+  % \end{itemize}
   
-  \item<2->Transactions
+  \item<1->Transactions
   \begin{itemize}
   \item idée inspirée des Bases de Donnée (langage \textbf{SQL})
   \item rendre ``atomique'' la section critique
   \item idée exploitée par exemple dans le langage \textbf{Clojure}
   \end{itemize}
   
-  \item<3->Coroutines
+  \item<2->Coroutines
   \begin{itemize}
   \item coroutines: des routines concurrentes pouvant ``vivre'' dans le même thread
   \item idée exploitée par exemple dans le langage \textbf{Go} (``goroutines'')
   \end{itemize}
 
-  \item<4->Réseaux de Petri (pour la modélisation)
+\item<3->Modélisation de la concurrence par diagrammes
+  \begin{itemize}
+  \item Réseaux de Petri
+  \item Diagrammes \textsc{uml} de séquence, d'activité et d'état
+  \end{itemize}
+  
   \end{itemize}
 \end{frame}
-
-\section{Conclusion}
-\minitoc
+\subsection{L'avenir de la concurrence}
 \begin{frame}
-  \frametitle{Conclusion: au-delà de la concurrence}
-  Réseaux de neurone!
+  \frametitle{L'avenir de la concurrence}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{reseaux-neurones.png}
+  \end{center}
 \end{frame}
 
 
