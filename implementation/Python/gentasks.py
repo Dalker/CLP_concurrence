@@ -2,8 +2,8 @@
 Générateurs de tâches pour comparer des approches concurrentes.
 
 Catégories de tâches:
-- calcul intensif (calcul itératif d'une factorielle)
-- I/O avec latence (lecture/écriture via SSH)
+  - calcul intensif (calcul itératif d'une factorielle)
+  - I/O avec latence (lecture/écriture via SSH)
 
 Author: Dalker (daniel.kessler@dalker.org)
 Date: 2021.06.20

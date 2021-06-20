@@ -28,9 +28,9 @@ Date: 2021.06.20
 import concurrent.futures
 import docopt
 import time
-import threading
 
 import gentasks
+from futurs_naifs import FutureNaif
 
 
 class Tests:
@@ -114,25 +114,6 @@ class Tests:
         if self.show_output:
             for future in futures:
                 print(future.result())
-
-
-class FutureNaif:
-    """Future implémenté "à la main", avec thread privé."""
-
-    def __init__(self, task):
-        """Initialiser un Future."""
-        self.done = False  # permettre au "client" de vérifier si c'est fini
-        self.result = None  # accès au résultat quand disponible
-        self._task = task
-        # pas besoin de lock vu que le thread est créé sur place
-        # et n'est référencé nulle part ailleurs (privé au Future)
-        self.__thread = threading.Thread(target=self._target)
-        self.__thread.start()
-
-    def _target(self):
-        """Travail à effectuer par le thread dédié."""
-        self.result = self._task()
-        self.done = True
 
 
 if __name__ == "__main__":
