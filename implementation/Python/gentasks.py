@@ -1,5 +1,5 @@
 """
-Itérateurs fournissant des tâches.
+Générateurs de tâches pour comparer des approches concurrentes.
 
 Catégories de tâches:
 - calcul intensif (calcul itératif d'une factorielle)
