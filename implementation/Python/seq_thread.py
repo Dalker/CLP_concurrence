@@ -59,7 +59,7 @@ class Tests:
         """Test de paquet de tâches avec futures "naïfs"."""
         futures = []
         for _ in range(self.n_tasks):
-            futures.append(MyFuture(self.tasker.next_task()))
+            futures.append(FutureNaif(self.tasker.next_task()))
         while futures:  # ceci est semblable a un "event queue"
             for future in futures:
                 if future.done:
@@ -73,13 +73,13 @@ class Tests:
                 executor.submit(self.tasker.next_task())
 
 
-class MyFuture:
-    """Futures sur threads implémentés "à la main" à partir de locks."""
+class FutureNaif:
+    """Future implémenté "à la main", avec thread privé."""
 
     def __init__(self, task):
         """Initialiser un Future."""
-        self.done = False
-        self.result = None
+        self.done = False  # permettre au "client" de vérifier si c'est fini
+        self.result = None  # accès au résultat quand disponible
         self._task = task
         # pas besoin de lock vu que le thread est créé sur place
         # et n'est référencé nulle part ailleurs (privé au Future)
