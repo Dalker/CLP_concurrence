@@ -258,30 +258,32 @@
   \end{minipage}
   \begin{minipage}{.49\textwidth}
     \begin{center}
-    \only<1>{\includegraphics[width=.5\textwidth]{monitor2.png}}
-    \only<2>{\includegraphics[width=.9\textwidth]{monitor.png}}      
+    \only<1>{\includegraphics[width=.5\textwidth]{moniteur-clair.png}}
+    %\only<2>{\includegraphics[width=.9\textwidth]{monitor.png}}      
     \end{center}
   \end{minipage}
 \end{frame} % moniteur
-\begin{frame}[containsverbatim]{Solution 3: \textbf{moniteur} (Hoare / Brinch-Hansen)}
-\begin{lstlisting}[language=Java]
-public class SynchronizedCounter {
-  private int c = 0;
+\ignore{
+% \begin{frame}[containsverbatim]{Solution 3: \textbf{moniteur} (Hoare / Brinch-Hansen)}
+% \begin{lstlisting}[language=Java]
+% public class SynchronizedCounter {
+%   private int c = 0;
 
-  public synchronized void increment() {
-    c++;
-  }
+%   public synchronized void increment() {
+%     c++;
+%   }
 
-  public synchronized void decrement() {
-    c--;
-  }
+%   public synchronized void decrement() {
+%     c--;
+%   }
 
-  public synchronized int value() {
-    return c;
-  }
+%   public synchronized int value() {
+%     return c;
+%   }
+% }
+% \end{lstlisting}}
+% \end{frame} % moniteur Java
 }
-\end{lstlisting}}
-\end{frame} % moniteur Java
 \begin{frame}
   \frametitle{Problème 3: \textbf{interblocage} et \textbf{famine}}
   \begin{minipage}{.55\textwidth}
@@ -322,8 +324,7 @@ public class SynchronizedCounter {
 
 \section{Côté pratique}
 \minitoc
-\subsection{Implémenation naïve}
-\begin{frame}[containsverbatim]{Implémenation naïve d'un Future minimal en Python}
+\subsection{Implémenation naïve}j\begin{frame}[containsverbatim]{Implémenation naïve d'un Future minimal en Python}
 \begin{lstlisting}
 class FutureNaif:
   """Future implémenté "à la main", avec thread privé."""
@@ -370,6 +371,7 @@ class FutureNaif:
 \section{Changement de paradigme}
 \minitoc
 \subsection{Autres manières d'utiliser des futures}
+
 \begin{frame}[containsverbatim]{Future avec \textbf{callback} associé (exemple en Scala)}
 \begin{lstlisting}[language=Scala]
 import scala.concurrent.Future
@@ -407,6 +409,7 @@ faireQuelqueChose()
   .catch(gererEchec);
 \end{lstlisting}
 \end{frame} % promises enchaînées (javascript)
+
 \subsection{Les fondamentaux de la concurrence (2)}
 \begin{frame}
   \frametitle{Les fondamentaux de la concurrence (2)}
@@ -447,8 +450,9 @@ faireQuelqueChose()
   % \par\bigskip\bigskip
   % \onslide<2>{NB: dans ce modèle, un Future est un Acteur}
 \end{frame} % déf Acteurs
-% \begin{frame}{Futures dans le modèle Acteurs}
-% \end{frame} % Futures dans modèle Acteur
+\begin{frame}{Futures dans le modèle Acteurs}
+\end{frame} % Futures dans modèle Acteur
+
 \begin{frame}[containsverbatim]
   \frametitle{Modèle d'Acteurs en Erlang}
   Le langage \textbf{Erlang} exploite bien ce modèle.
@@ -495,9 +499,10 @@ start() ->
   \begin{center}
     \includegraphics[width=.75\textwidth]{pi-calculus.png}    
   \end{center}
-  \par\bigksip\bigskip\bigskip\bigskip\bigskip\phantom+
+  \par\bigskip\bigskip\bigskip\bigskip\bigskip\phantom+
 }
 \end{frame} % pi-calc de Milner
+
 \begin{frame}{Équivalence des paradigmes}
   Lauer et Needham on montré que les modèles de concurrence basé sur
   procédures et les modèles basés sur messages sont équivalents (``duaux'').
@@ -539,7 +544,7 @@ start() ->
     \item idée inspirée des Bases de Donnée (par exemple langage \textbf{SQL})
     \item rendre ``atomique'' la section critique
     \item idée exploitée par exemple dans le langage \textbf{Clojure}
-    \end{itemnize}
+    \end{itemize}
   
   \item<3->Coroutines
     \begin{itemize}
