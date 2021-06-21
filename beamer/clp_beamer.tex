@@ -216,7 +216,7 @@
   \frametitle{Solution 1: \textbf{verrou} (lock)}
   Un \textbf{verrou} limite l'accès d'une ressource à une seule tâche.
   \begin{itemize}
-  \item état fermé vs. état ouvert
+  \item état fermé \textit{vs} état ouvert
   \item si le verrou est fermé, les tâches sont bloquées
   \item sinon, une tâche qui accède à la ressource ferme le verrou
   \item quand la tâche finit, elle ouvre le verrou
@@ -303,7 +303,7 @@ public class SynchronizedCounter {
   \end{minipage}
 \end{frame} % interblocage et famine
 \begin{frame}
-  \frametitle{Solution 4: Futures et Promises (Hewitt, resp. Liskov)}
+  \frametitle{Solution 4: Futures et Promises (Hewitt / Liskov)}
   % \begin{minipage}{.5\textwidth}
   Les \textbf{Futures} et \textbf{Promises} sont des abstractions
   de plus haut niveau que les verrous, sémaphores ou moniteurs.
@@ -444,6 +444,8 @@ faireQuelqueChose()
   \item Créer d'autres acteurs
   \item Décider de son comportement à la prochaine réception de message
   \end{itemize}
+  % \par\bigskip\bigskip
+  % \onslide<2>{NB: dans ce modèle, un Future est un Acteur}
 \end{frame} % déf Acteurs
 % \begin{frame}{Futures dans le modèle Acteurs}
 % \end{frame} % Futures dans modèle Acteur
@@ -488,8 +490,7 @@ start() ->
     processes, objects—are all of the same kind of thing; \textbf{they should all be
     processes}.
   \end{quotation}
-  \hfill Robin Milner, inventeur du $\pi$-calculus (\textit{Turing Lecture}
-  1993)
+  \hfill Robin Milner (\textit{Turing Lecture} 1993)
 }\only<2>{
   \begin{center}
     \includegraphics[width=.75\textwidth]{pi-calculus.png}    
@@ -498,9 +499,9 @@ start() ->
 }
 \end{frame} % pi-calc de Milner
 \begin{frame}{Équivalence des paradigmes}
-  Lauer et Needham on montré en 1978 que les modèles de concurrence basé sur
+  Lauer et Needham on montré que les modèles de concurrence basé sur
   procédures et les modèles basés sur messages sont équivalents (``duaux'').
-  \par\bigskip
+  \par\medskip
   \hfill{$\rightarrow$ \footnotesize{}cf. \textit{On the duality of operating system structures}
     H. Lauer, R. Needham 1978}
   \par\bigskip
@@ -533,24 +534,24 @@ start() ->
   % \item ``event handlers'' (callbacks)
   % \end{itemize}
   
-  \item<1->Transactions
-  \begin{itemize}
-  \item idée inspirée des Bases de Donnée (langage \textbf{SQL})
-  \item rendre ``atomique'' la section critique
-  \item idée exploitée par exemple dans le langage \textbf{Clojure}
-  \end{itemize}
+  \item<2->Transactions
+    \begin{itemize}
+    \item idée inspirée des Bases de Donnée (par exemple langage \textbf{SQL})
+    \item rendre ``atomique'' la section critique
+    \item idée exploitée par exemple dans le langage \textbf{Clojure}
+    \end{itemnize}
   
-  \item<2->Coroutines
-  \begin{itemize}
-  \item coroutines: des routines concurrentes pouvant ``vivre'' dans le même thread
-  \item idée exploitée par exemple dans le langage \textbf{Go} (``goroutines'')
-  \end{itemize}
+  \item<3->Coroutines
+    \begin{itemize}
+    \item coroutines: des routines concurrentes pouvant ``vivre'' dans le même thread
+    \item idée exploitée par exemple dans le langage \textbf{Go} (``goroutines'')
+    \end{itemize}
 
-\item<3->Modélisation de la concurrence par diagrammes
-  \begin{itemize}
-  \item Réseaux de Petri
-  \item Diagrammes \textsc{uml} de séquence, d'activité et d'état
-  \end{itemize}
+  \item<4->Modélisation de la concurrence par diagrammes
+    \begin{itemize}
+    \item Réseaux de Petri
+    \item Diagrammes \textsc{uml} de séquence, d'activité et d'état
+    \end{itemize}
   
   \end{itemize}
 \end{frame}
