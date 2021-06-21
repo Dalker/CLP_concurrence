@@ -263,27 +263,25 @@
     \end{center}
   \end{minipage}
 \end{frame} % moniteur
-\ignore{
-% \begin{frame}[containsverbatim]{Solution 3: \textbf{moniteur} (Hoare / Brinch-Hansen)}
-% \begin{lstlisting}[language=Java]
-% public class SynchronizedCounter {
-%   private int c = 0;
+\begin{frame}[containsverbatim]{Solution 3: \textbf{moniteur} (Hoare / Brinch-Hansen)}
+\begin{lstlisting}[language=Java]
+public class SynchronizedCounter {
+  private int c = 0;
 
-%   public synchronized void increment() {
-%     c++;
-%   }
+  public synchronized void increment() {
+    c++;
+  }
 
-%   public synchronized void decrement() {
-%     c--;
-%   }
+  public synchronized void decrement() {
+    c--;
+  }
 
-%   public synchronized int value() {
-%     return c;
-%   }
-% }
-% \end{lstlisting}}
-% \end{frame} % moniteur Java
+  public synchronized int value() {
+    return c;
+  }
 }
+\end{lstlisting}}
+\end{frame} % moniteur Java
 \begin{frame}
   \frametitle{Problème 3: \textbf{interblocage} et \textbf{famine}}
   \begin{minipage}{.55\textwidth}
